@@ -1,5 +1,6 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2015)
-and may not be redistributed without written permission.*/
+//chess.cpp
+//
+//plays game of chess
 
 //Using SDL, SDL_image, standard IO, math, and strings
 #include <SDL2/SDL.h>
