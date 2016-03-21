@@ -5,17 +5,17 @@ This is a repository for [CSE-20212] project **Chess**.
 
 **Members**:
 
-	**Name**: Brian Byrne
-	**NetID**: bbyrne5
+* **Name**: Brian Byrne
+* **NetID**: bbyrne5
 
-	**Name**: David Mellitt
-	**NetID**: dmellitt
+* **Name**: David Mellitt
+* **NetID**: dmellitt
 
-	**Name**: Troy Prince
-	**NetID**: tprince
+* **Name**: Troy Prince
+* **NetID**: tprince
 
-	**Name**: Kevin Trinh
-	**NetID**: ktrinh1
+* **Name**: Kevin Trinh
+* **NetID**: ktrinh1
 
 Implementation
 --------
