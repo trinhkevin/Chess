@@ -1,6 +1,6 @@
 // piece.h
 //
-// Prototype for Piece class
+// Contains the Piece class
 
 #ifndef PIECE_H
 #define PIECE_H
@@ -8,20 +8,25 @@
 #include <string>
 #include <deque>
 
-typedef move int[2];
+typedef coord int[2];
 
 class Piece {
 
 	public:
-		int[2] getPosition() = 0;
-		void setPosition(int, int) = 0;
+		Piece(string nName, coord nPosition);
+		coord getPosition() = 0;
+		void setPosition(coord) = 0;
 		string getName() = 0;
-		deque<int{2]> getPossMoves() = 0;
+		deque<coord> getPossMoves() = 0;
 	private:
 		int position[2];
 		string name;
-		deque<int> possMoves;
 };
+
+Piece(string nName, coord nPosition) {
+	name = nName;
+	setPosition(coord);
+}
 
 int[2] Piece::getPosition() {
 	return position;
@@ -35,8 +40,8 @@ string Piece::getName() {
 	return name;
 }
 
-deque Piece::getPossMoves() {
+/* deque<coord> Piece::getPossMoves() {
 	return possMoves;
-}
+} */
 
 #endif
