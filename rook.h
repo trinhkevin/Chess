@@ -16,7 +16,7 @@ class Rook : public Piece {
 		bool hasMoved = false;
 }
 
-Rook::Rook(coord position, bool color):Piece("Rook", position, color) {
+Rook::Rook(coord position, bool color) : Piece("Rook", position, color) {
 }
 
 deque<coord> Rook::getPossMoves() {
