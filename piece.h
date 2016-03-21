@@ -15,7 +15,7 @@ class Piece {
 	public:
 		Piece(string nName, coord nPosition);
 		virtual coord getPosition();
-		virtual void setPosition(coord) = 0;
+		virtual void setPosition(coord nPosition);
 		virtual string getName();
 		virtual deque<coord> getPossMoves() = 0;
 	private:
@@ -32,9 +32,9 @@ coord Piece::getPosition() {
 	return position;
 }
 
-/*void Piece::setPosition(int x, int y) {
-	position[2] = [x, y];
-}*/
+void Piece::setPosition(coord nPosition) {
+	position = nPosition;
+}
 
 string Piece::getName() {
 	return name;
