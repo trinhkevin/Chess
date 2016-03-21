@@ -1,21 +1,21 @@
 Chess
 ==========
 
-This is a repository for [CSE-20212] project *Chess*.
+This is a repository for [CSE-20212] project **Chess**.
 
-*Members*:
+**Members**:
 
-* **Name**: Brian Byrne
-* **NetID**: bbyrne5
+	**Name**: Brian Byrne
+	**NetID**: bbyrne5
 
-* **Name**: David Mellitt
-* **NetID**: dmellitt
+	**Name**: David Mellitt
+	**NetID**: dmellitt
 
-* **Name**: Troy Prince
-* **NetID**: tprince
+	**Name**: Troy Prince
+	**NetID**: tprince
 
-* **Name**: Kevin Trinh
-* **NetID**: ktrinh1
+	**Name**: Kevin Trinh
+	**NetID**: ktrinh1
 
 Implementation
 --------
@@ -26,4 +26,4 @@ This game will include:
 * AI
 * Graphics Utilizing SDL2
 
-**This is currently a WIP.**
+*This is currently a WIP.*
