@@ -10,31 +10,40 @@
 class Knight : public Piece {
 
 	public:
-		Knight(string nName, coord nPosition);
-		coord getPosition();
-		void setPosition(coord nPosition);
-		string getName();
+		Knight(coord);
 		deque<coord> getPossMoves();
 	private:
 }
 
-Knight(string nName, coord nPosition):Piece(nName, nPosition) {
-}
-
-coord getPosition() {
-	return position;
-}
-
-void setPosition(coord nPosition) {
-	position = nPosition;
-}
-
-string getName() {
-	return name;
+Knight(coord nPosition) : Piece("Knight", nPosition) {
 }
 
 deque<coord> getPossMoves() {
-	
+
+	// Initialize Variables
+	coord position = getPosition();
+	coord nCoord;
+	i = position[0];
+	j = position[1];
+	deque<coord> possMoves;
+
+	// Up Right
+	nCoord = [i+1, j+2];
+	possMove.push_back(nCoord);
+
+	// Up Left
+	nCoord = [i-1, j+2];
+	possMove.push_back(nCoord);
+
+	// Down Right
+	nCoord = [i+1, j-2];
+	possMove.push_back(nCoord);
+
+	// Down Left
+	nCoord = [i-1, j-2];
+	possMove.push_back(nCoord);
+
+	return possMoves;
 }
 
 #endif
