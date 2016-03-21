@@ -13,7 +13,7 @@ typedef coord int[2];
 class Piece {
 
 	public:
-		Piece(string nName, coord nPosition);
+		Piece(string nName, coord nPosition, bool nColor);
 		virtual coord getPosition();
 		virtual void setPosition(coord nPosition);
 		virtual string getName();
@@ -21,11 +21,13 @@ class Piece {
 	private:
 		coord position;
 		string name;
+		bool color;
 };
 
-Piece(string nName, coord nPosition) {
+Piece::Piece(string nName, coord nPosition, bool nColor) {
 	name = nName;
 	setPosition(coord);
+	color = nColor;
 }
 
 coord Piece::getPosition() {

@@ -10,26 +10,35 @@
 class Bishop : public Piece {
 
 	public:
-		Bishop(string nName, coord nPosition);
+		Bishop(coord, bool);
 		deque<coord> getPossMoves();
 	private:
 }
 
-Bishop(string nName, coord nPosition):Piece(nName, nPosition) {
+Bishop::Bishop(coord position, bool color) : Piece("Bishop", position, color) {
 }
 
-deque<coord> getPossMoves() {
-  //This deque will contain all locations, on or off the board, that are less than a distance of 8 in all four diagonal directions from the bishop
-  pos = getPosition();
-  int x = pos[0];
-  int y = pos[1];
-  deque<coord> possMoves;
+deque<coord> Bishop::getPossMoves() {
 
-  for(int i=1; counter < 8; ++ counter) {
-    possMoves.push_back([x+i, y+i]);
-    possMoves.push_back([x+i, y-i]);
-    possMoves.push_back([x-i, y+i]);
-    possMoves.push_back([x-i, y-i]);
+	// This deque will contain all locations, on or off
+	// the board, that are less than a distance of 8 in
+	// all four diagonal directions from the bishop
+
+	// Initialize Variables
+	pos = getPosition();
+	int x = pos[0];
+	int y = pos[1];
+	deque<coord> possMoves;
+
+	// Loop and Find Possible Moves
+	for(int i = 1; i < 8; ++i) {
+		possMoves.push_back([x+i, y+i]);
+		possMoves.push_back([x+i, y-i]);
+		possMoves.push_back([x-i, y+i]);
+		possMoves.push_back([x-i, y-i]);
+	}
+
+	return possMoves;
 }
 
 #endif

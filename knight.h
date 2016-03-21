@@ -10,21 +10,21 @@
 class Knight : public Piece {
 
 	public:
-		Knight(coord);
+		Knight(coord, bool);
 		deque<coord> getPossMoves();
 	private:
 }
 
-Knight(coord nPosition) : Piece("Knight", nPosition) {
+Knight::Knight(coord position, bool color) : Piece("Knight", position, color) {
 }
 
-deque<coord> getPossMoves() {
+deque<coord> Knight::getPossMoves() {
 
 	// Initialize Variables
 	coord position = getPosition();
 	coord nCoord;
-	i = position[0];
-	j = position[1];
+	int i = position[0];
+	int j = position[1];
 	deque<coord> possMoves;
 
 	// Up Right

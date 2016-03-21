@@ -10,25 +10,39 @@
 class Rook : public Piece {
 
 	public:
-		Rook(string nName, coord nPosition);
+		Rook(coord, bool);
 		deque<coord> getPossMoves();
 	private:
 		bool hasMoved = false;
 }
 
-Rook(string nName, coord nPosition):Piece(nName, nPosition) {
+Rook::Rook(coord position, bool color):Piece("Rook", position, color) {
 }
 
-deque<coord> getPossMoves() {
-  //The positions on this deque will be all positions on the board in the same row or column as the piece, except for the piece's current position
-  pos = getPosition();
-  int x = pos[0];
-  int y = pos[1];
-  deque<coord> possMoves;
+deque<coord> Rook::getPossMoves() {
 
-  for(int counter=0; counter < 8; ++ counter) {
-    if (counter != x) possMoves.push_back([x, counter]);
-    if (counter != y) possMoves.push_back([counter, y]);
+	// The positions on this deque will be
+	// all positions on the board in the same
+	// row or column as the piece, except for
+	// the piece's current position
+
+	// Initialize Variables
+	pos = getPosition();
+  	int x = pos[0];
+  	int y = pos[1];
+  	deque<coord> possMoves;
+
+	// Compute Possible Moves
+  	for(int counter=0; counter < 8; ++ counter) {
+    		if (counter != x) {
+			possMoves.push_back([x, counter]);
+		}
+    		if (counter != y) {
+			possMoves.push_back([counter, y]);
+		}
+	}
+
+	return possMoves;
 }
 
 #endif

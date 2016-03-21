@@ -10,30 +10,40 @@
 class Queen : public Piece {
 
 	public:
-		Queen(string nName, coord nPosition);
+		Queen(coord, bool);
 		deque<coord> getPossMoves();
 	private:
 }
 
-Queenp(string nName, coord nPosition):Piece(nName, nPosition) {
+Queen::Queen(coord position, bool color) : Piece("Queen", position, color) {
 }
 
-deque<coord> getPossMoves() {
-  //This deque will contain all locations, on or off the board, that are less than a distance of 8 in all 8 directions from the Queen
-  pos = getPosition();
-  int x = pos[0];
-  int y = pos[1];
-  deque<coord> possMoves;
+deque<coord> Queen::getPossMoves() {
 
-  for(int i=1; counter < 8; ++ counter) {
-    possMoves.push_back([x+i, y+i]);
-    possMoves.push_back([x+i, y-i]);
-    possMoves.push_back([x-i, y+i]);
-    possMoves.push_back([x-i, y-i]);
-    possMoves.push_back([x, y+i]);
-    possMoves.push_back([x, y-i]);
-    possMoves.push_back([x+i, y]);
-    possMoves.push_back([x-i, y]);
+	// This deque will contain all locations,
+	// on or off the board, that are less than
+	// a distance of 8 in all 8 directions from
+	// the Queen
+
+	// Initialize Variables
+	pos = getPosition();
+	int x = pos[0];
+	int y = pos[1];
+	deque<coord> possMoves;
+
+	// Compute Possible Moves
+	for(int i = 1; i < 8; ++i) {
+    		possMoves.push_back([x+i, y+i]);
+    		possMoves.push_back([x+i, y-i]);
+    		possMoves.push_back([x-i, y+i]);
+    		possMoves.push_back([x-i, y-i]);
+    		possMoves.push_back([x, y+i]);
+    		possMoves.push_back([x, y-i]);
+    		possMoves.push_back([x+i, y]);
+    		possMoves.push_back([x-i, y]);
+	}
+
+	return possMoves;
 }
 
 #endif
