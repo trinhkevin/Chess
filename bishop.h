@@ -10,12 +10,12 @@
 class Bishop : public Piece {
 
 	public:
-		Bishop(int, bool);
+		Bishop(coord, bool);
 		//deque<coord> getPossMoves();
 	private:
 };
 
-Bishop::Bishop(int nPosition, bool nColor) : Piece(bishop, nPosition, nColor) {
+Bishop::Bishop(coord nPosition, bool nColor) : Piece(bishop, nPosition, nColor) {
 }
 /*
 deque<coord> Bishop::getPossMoves() {

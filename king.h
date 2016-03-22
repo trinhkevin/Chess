@@ -10,12 +10,12 @@
 class King : public Piece {
 
 	public:
-		King(int, bool);
+		King(coord, bool);
 		//deque<int> getPossMoves();
 	private:
 };
 
-King::King(int nPosition, bool nColor) : Piece(king, nPosition, nColor) {
+King::King(coord nPosition, bool nColor) : Piece(king, nPosition, nColor) {
 }
 /*
 deque<coord> King::getPosition() {

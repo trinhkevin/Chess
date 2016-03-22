@@ -20,6 +20,7 @@ using std::vector;
 
 #define WHITE 0
 #define BLACK 1
+typedef int coord[2];
 
 class Board {
 
@@ -39,29 +40,47 @@ class Board {
 };
 
 Board::Board(int nSide) : SIDE(nSide){
-  pieces.push_back(new Rook(0,1));
-  pieces.push_back(new Knight(1,1));
-  pieces.push_back(new Bishop(2,1));
-  pieces.push_back(new King(3,1));
-  pieces.push_back(new Queen(4,1));
-  pieces.push_back(new Bishop(5,1));
-  pieces.push_back(new Knight(6,1));
-  pieces.push_back(new Rook(7,1));
 
-  pieces.push_back(new Rook(56,0));
-  pieces.push_back(new Knight(57,0));
-  pieces.push_back(new Bishop(58,0));
-  pieces.push_back(new King(59,0));
-  pieces.push_back(new Queen(60,0));
-  pieces.push_back(new Bishop(61,0));
-  pieces.push_back(new Knight(62,0));
-  pieces.push_back(new Rook(63,0));
-  
+  coord pos = {0,0};
+  pieces.push_back(new Rook(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Knight(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Bishop(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new King(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Queen(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Bishop(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Knight(pos,WHITE));
+  pos[0]++;
+  pieces.push_back(new Rook(pos,WHITE));
+
+  pos[0] = 0; pos[1] = 7;
+  pieces.push_back(new Rook(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Knight(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Bishop(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new King(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Queen(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Bishop(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Knight(pos,BLACK));
+  pos[0]++;
+  pieces.push_back(new Rook(pos,BLACK));
 
   for(int i = 0; i < 8; i++)
   {
-    pieces.push_back(new Pawn(8+i,1));
-    pieces.push_back(new Pawn(48+i,0));
+    pos[0] = i; pos[1] = 1;
+    pieces.push_back(new Pawn(pos,WHITE));
+    pos[1] = 6;
+    pieces.push_back(new Pawn(pos,BLACK));
   }
 }
 
@@ -81,9 +100,9 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[1
 
       //Alternate gray and white
       if( (i+j)%2 )
-        SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+        SDL_SetRenderDrawColor( gRenderer, 0x60, 0x60, 0x60, 0xFF );
       else
-        SDL_SetRenderDrawColor( gRenderer, 0x80, 0x80, 0x80, 0xFF );
+        SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
       SDL_RenderFillRect( gRenderer, &fillRect );
     }
