@@ -3,15 +3,13 @@
 //plays game of chess
 
 //Using SDL, SDL_image, standard IO, math, and strings
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <stdio.h>
-#include <string>
+
 #include <cmath>
+#include "LTexture.h"
+#include "board.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 600;
-const int SCREEN_HEIGHT = 600;
+const int SIDE = 664;
 
 //Starts up SDL and creates window
 bool init();
@@ -30,6 +28,10 @@ SDL_Window* gWindow = NULL;
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
+
+//Scene sprites
+SDL_Rect gSpriteClips[ 12 ];
+LTexture gSpriteSheetTexture;
 
 bool init()
 {
@@ -51,7 +53,7 @@ bool init()
     }
 
     //Create window
-    gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+    gWindow = SDL_CreateWindow( "Chess", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SIDE, SIDE, SDL_WINDOW_SHOWN );
     if( gWindow == NULL )
     {
       printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -90,12 +92,31 @@ bool loadMedia()
   //Loading success flag
   bool success = true;
 
-  //Nothing to load
+  //Load sprite sheet texture
+  if( !gSpriteSheetTexture.loadFromFile( gRenderer, "Chess_Sprites.png" ) )
+  {
+    printf( "Failed to load sprite sheet texture!\n" );
+    success = false;
+  }
+  else
+  {
+    for(int i = 0; i < 12; i++)
+    {
+      gSpriteClips[ i ].x = 83*(i%6);
+      gSpriteClips[ i ].y = 83*(i/6);
+      gSpriteClips[ i ].w = 83;
+      gSpriteClips[ i ].h = 83;
+    }
+  }
+
   return success;
 }
 
 void close()
 {
+  //Free loaded images
+  gSpriteSheetTexture.free();
+
   //Destroy window  
   SDL_DestroyRenderer( gRenderer );
   SDL_DestroyWindow( gWindow );
@@ -152,9 +173,11 @@ int main( int argc, char* args[] )
     {  
       //Main loop flag
       bool quit = false;
-
+      
       //Event handler
       SDL_Event e;
+
+      Board chessBoard( SIDE );
 
       //While application is running
       while( !quit )
@@ -173,20 +196,8 @@ int main( int argc, char* args[] )
         SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear( gRenderer );
         
-        //Draw board
-        for(int i = 0; i < 8; i++)
-          for(int j = 0; j < 8; j++)
-          {
-            SDL_Rect fillRect = { SCREEN_WIDTH/8*j, SCREEN_HEIGHT/8*i, SCREEN_WIDTH/8*(j+1), SCREEN_HEIGHT/8*(i+1) };
+        chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
 
-            //Alternate black and white
-            if( (i+j)%2 )
-              SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );    
-            else
-              SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
-
-            SDL_RenderFillRect( gRenderer, &fillRect );
-          }
         //Update screen
         SDL_RenderPresent( gRenderer );
       }

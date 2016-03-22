@@ -10,14 +10,14 @@
 class Bishop : public Piece {
 
 	public:
-		Bishop(coord, bool);
-		deque<coord> getPossMoves();
+		Bishop(int, bool);
+		//deque<coord> getPossMoves();
 	private:
-}
+};
 
-Bishop::Bishop(coord position, bool color) : Piece("Bishop", position, color) {
+Bishop::Bishop(int nPosition, bool nColor) : Piece(bishop, nPosition, nColor) {
 }
-
+/*
 deque<coord> Bishop::getPossMoves() {
 
 	// This deque will contain all locations, on or off
@@ -40,5 +40,5 @@ deque<coord> Bishop::getPossMoves() {
 
 	return possMoves;
 }
-
+*/
 #endif

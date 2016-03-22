@@ -10,14 +10,14 @@
 class King : public Piece {
 
 	public:
-		King(coord, bool);
-		deque<coord> getPossMoves();
+		King(int, bool);
+		//deque<int> getPossMoves();
 	private:
-}
+};
 
-King::King(coord position, bool color) : Piece("King", position, color) {
+King::King(int nPosition, bool nColor) : Piece(king, nPosition, nColor) {
 }
-
+/*
 deque<coord> King::getPosition() {
 
 	// Initialize Variables
@@ -60,4 +60,6 @@ deque<coord> King::getPosition() {
 	possMove.push_back(nCoord);
 
 	return possMoves;
-}
+}*/
+
+#endif

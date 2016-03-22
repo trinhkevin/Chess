@@ -10,15 +10,15 @@
 class Rook : public Piece {
 
 	public:
-		Rook(coord, bool);
-		deque<coord> getPossMoves();
+		Rook(int, bool);
+		//deque<coord> getPossMoves();
 	private:
 		bool hasMoved = false;
-}
+};
 
-Rook::Rook(coord position, bool color) : Piece("Rook", position, color) {
+Rook::Rook(int nPosition, bool nColor) : Piece(rook, nPosition, nColor) {
 }
-
+/*
 deque<coord> Rook::getPossMoves() {
 
 	// The positions on this deque will be
@@ -44,5 +44,5 @@ deque<coord> Rook::getPossMoves() {
 
 	return possMoves;
 }
-
+*/
 #endif

@@ -9,16 +9,15 @@
 
 class Pawn : public Piece{
     public:
-        Pawn(coord, bool);
-		virtual deque<coord> getPossMoves() = 0;
+        Pawn(int, bool);
+	//virtual deque<coord> getPossMoves() = 0;
     private:
-        bool hasMoved() = false;
+};
+
+Pawn::Pawn(int nPosition, bool nColor) : Piece(pawn, nPosition, nColor) {
 }
 
-Pawn::Pawn(coord position, bool color) : Piece("Pawn", position, color) {
-}
-
-deque<coord> Pawn::getPossMoves(){
+/*deque<coord> Pawn::getPossMoves(){
 
 	// Initialize Variables
 	deque<coord> moves;
@@ -42,5 +41,5 @@ deque<coord> Pawn::getPossMoves(){
 
 	return moves
 }
-
+*/
 #endif

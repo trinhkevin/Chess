@@ -10,14 +10,14 @@
 class Queen : public Piece {
 
 	public:
-		Queen(coord, bool);
-		deque<coord> getPossMoves();
+		Queen(int, bool);
+		//deque<coord> getPossMoves();
 	private:
-}
+};
 
-Queen::Queen(coord position, bool color) : Piece("Queen", position, color) {
+Queen::Queen(int nPosition, bool nColor) : Piece(queen, nPosition, nColor) {
 }
-
+/*
 deque<coord> Queen::getPossMoves() {
 
 	// This deque will contain all locations,
@@ -45,5 +45,5 @@ deque<coord> Queen::getPossMoves() {
 
 	return possMoves;
 }
-
+*/
 #endif
