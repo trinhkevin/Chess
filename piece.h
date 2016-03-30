@@ -10,6 +10,7 @@
 
 using std::deque;
 
+const int CLIPNUM = 13;
 enum pieceType{ king, queen, bishop, knight, rook, pawn };
 typedef int coord[2];
 
@@ -17,15 +18,18 @@ class Piece {
 
 	public:
 		Piece(pieceType nType, coord nPosition, bool nColor);
-		coord* getPosition();
+		coord* getPosition()  { return &position; }
 		void setPosition(coord nPosition);
-		pieceType getType();
-		void display(SDL_Renderer*, LTexture&, SDL_Rect[12], int);
+		pieceType getType()   { return type; }
+		void select()         { selected = true; }
+                void deselect()       { selected = false; }
+		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 		//virtual deque<coord> getPossMoves() = 0;
 	private:
 		coord position;
 		pieceType type;
 		bool color;
+		bool selected = false;
 };
 
 Piece::Piece(pieceType nType, coord nPosition, bool nColor) {
@@ -34,21 +38,18 @@ Piece::Piece(pieceType nType, coord nPosition, bool nColor) {
 	color = nColor;
 }
 
-coord* Piece::getPosition() {
-	return &position;
-}
-
 void Piece::setPosition(coord nPosition) {
 	position[0] = nPosition[0];
 	position[1] = nPosition[1];
 }
 
-pieceType Piece::getType() {
-	return type;
-}
+void Piece::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[CLIPNUM], int SIDE) {
+  //glow if selected
+  if(selected)	
+    texture.render(gRenderer, SIDE/8*(position[0]), SIDE/8*7-SIDE/8*(position[1]), &clips[12]);
 
-void Piece::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[12], int SIDE) {
-	texture.render(gRenderer, SIDE/8*(position[0]), SIDE/8*7-SIDE/8*(position[1]), &clips[type + color*6]);
+  //render piece
+  texture.render(gRenderer, SIDE/8*(position[0]), SIDE/8*7-SIDE/8*(position[1]), &clips[type + color*6]);
 }
 
 #endif

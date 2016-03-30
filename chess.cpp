@@ -8,9 +8,6 @@
 #include "LTexture.h"
 #include "board.h"
 
-//Screen dimension constants
-const int SIDE = 664;
-
 //Starts up SDL and creates window
 bool init();
 
@@ -30,7 +27,7 @@ SDL_Window* gWindow = NULL;
 SDL_Renderer* gRenderer = NULL;
 
 //Scene sprites
-SDL_Rect gSpriteClips[ 12 ];
+SDL_Rect gSpriteClips[ CLIPNUM ];
 LTexture gSpriteSheetTexture;
 
 bool init()
@@ -100,7 +97,7 @@ bool loadMedia()
   }
   else
   {
-    for(int i = 0; i < 12; i++)
+    for(int i = 0; i < CLIPNUM; i++)
     {
       gSpriteClips[ i ].x = 83*(i%6);
       gSpriteClips[ i ].y = 83*(i/6);
@@ -177,7 +174,7 @@ int main( int argc, char* args[] )
       //Event handler
       SDL_Event e;
 
-      Board chessBoard( SIDE );
+      Board chessBoard;
 
       //While application is running
       while( !quit )
@@ -187,9 +184,9 @@ int main( int argc, char* args[] )
         {
           //User requests quit
           if( e.type == SDL_QUIT )
-          {
             quit = true;
-          }
+
+          chessBoard.handleEvent( &e );
         }
 
         //Clear screen
