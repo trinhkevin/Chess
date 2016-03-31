@@ -10,36 +10,33 @@
 class Pawn : public Piece{
     public:
 	Pawn(coord, bool);
-	//virtual deque<coord> getPossMoves();
     private:
+	virtual deque<coord*> findPossMoves();
+	bool hasMoved = false;
 };
 
 Pawn::Pawn(coord nPosition, bool nColor) : Piece(pawn, nPosition, nColor) {
 }
-/*
-deque<coord> Pawn::getPossMoves(){
+
+deque<coord*> Pawn::findPossMoves(){
 
 	// Initialize Variables
-	deque<coord> moves;
-	coord* pos = getPosition();
-	coord ncoord;
-	int x = (*pos)[0];
-	int y = (*pos)[1];
+	deque<coord*> moves;
+	coord* ncoord = new coord[1];
+	int x = (*getPosition())[0];
+	int y = (*getPosition())[1];
 
 	// Compute Moves
-	ncoord[0] = x; ncoord[0] = y+1;
-	//moves.push_back(ncoord);
+	(*ncoord)[0] = x; (*ncoord)[1] = y+1-getColor()*2;
+	moves.push_back(ncoord);
 
-	ncoord[0] = y+2;
-	//moves.push_back(ncoord);
-
-	ncoord[0] =x+1; ncoord[1] = y+1;
-	//moves.push_back(ncoord);
-
-	ncoord[0] = x-1;
-	//moves.push_back(ncoord);
+	if(!hasMoved) {
+	  ncoord = new coord[1];
+	  (*ncoord)[0] = x; (*ncoord)[1] = y+2-getColor()*4;
+	  moves.push_back(ncoord);
+	}
 
 	return moves;
 }
-*/
+
 #endif

@@ -8,12 +8,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "piece.h"
-#include "bishop.h"
-#include "king.h"
-#include "knight.h"
+//#include "bishop.h"
+//#include "king.h"
+//#include "knight.h"
 #include "pawn.h"
-#include "queen.h"
-#include "rook.h"
+//#include "queen.h"
+//#include "rook.h"
 #include <vector>
 
 using std::vector;
@@ -43,7 +43,7 @@ class Board {
 Board::Board(){
 
   coord pos = {0,0};
-  pieces.push_back(new Rook(pos,WHITE));
+/*  pieces.push_back(new Rook(pos,WHITE));
   pos[0]++;
   pieces.push_back(new Knight(pos,WHITE));
   pos[0]++;
@@ -75,7 +75,7 @@ Board::Board(){
   pieces.push_back(new Knight(pos,BLACK));
   pos[0]++;
   pieces.push_back(new Rook(pos,BLACK));
-
+*/
   for(int i = 0; i < 8; i++)
   {
     pos[0] = i; pos[1] = 1;
