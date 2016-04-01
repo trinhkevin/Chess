@@ -18,63 +18,63 @@ class Piece {
 
 	public:
 		Piece(pieceType nType, coord nPosition, bool nColor);
+		~Piece() { deselect(); }
 		coord* getPosition()	{ return &position; }
-		void setPosition(coord nPosition);
+		void move(coord nPosition);
 		pieceType getType()	{ return type; }
+		bool getHasMoved()	{ return hasMoved; }
 		bool getColor()		{ return color; }
-		void select();
-                void deselect();
+		void select()		{ selected = true; }
+		bool getSelected() 	{ return selected; }
+                void deselect()		{ selected = false; }
+		virtual deque<coord*> findPossMoves(deque<Piece*>) = 0;
+		bool checkSpace( coord*, bool, deque<Piece*> );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
-		virtual deque<coord*> findPossMoves() = 0;
-		deque<coord*> possMoves;
 		coord position;
 		pieceType type;
 		bool color;
 		bool selected = false;
+		bool hasMoved = false;
 };
 
 Piece::Piece(pieceType nType, coord nPosition, bool nColor) {
+	
+	position[0] = nPosition[0];
+	position[1] = nPosition[1];
+
 	type = nType;
-	setPosition(nPosition);
 	color = nColor;
 }
 
-void Piece::select() {
-  
-  selected = true;
-  possMoves = findPossMoves();
+bool Piece::checkSpace( coord* space, bool col, deque<Piece*> pieces) {
+
+  bool blocked = false;
+
+  for(int i = 0; i < pieces.size(); i++)
+    if( (*pieces[i]->getPosition())[0] == (*space)[0] &&
+        (*pieces[i]->getPosition())[1] == (*space)[1] &&
+        pieces[i]->getColor() == col)
+          blocked = true;
+
+  return blocked;
 }
 
-void Piece::deselect() {
-  
-  if(selected)
-    for(int i = 0; i < possMoves.size(); i++)
-      delete[] possMoves[i];
-
-  possMoves.clear();
-
-  selected = false;
-}
-
-void Piece::setPosition(coord nPosition) {
+void Piece::move(coord nPosition) {
 	position[0] = nPosition[0];
 	position[1] = nPosition[1];
+	hasMoved = true;
+	deselect();
 }
 
 void Piece::display(SDL_Renderer* gRenderer, LTexture &texture, 
                     SDL_Rect clips[CLIPNUM], int SIDE) {
 
   //glow and show moves if selected
-  if(selected) {
+  if(selected) 
     texture.render(gRenderer, SIDE/8*(position[0]), 
                    SIDE/8*7-SIDE/8*(position[1]), &clips[12]);
 
-    for(int i = 0; i < possMoves.size(); i++)
-      texture.render(gRenderer, SIDE/8*((*possMoves[i])[0]), 
-                     SIDE/8*7-SIDE/8*((*possMoves[i])[1]), &clips[13]);
-  
-  }
   //render piece
   texture.render(gRenderer, SIDE/8*(position[0]), 
                  SIDE/8*7-SIDE/8*(position[1]), &clips[type + color*6]);

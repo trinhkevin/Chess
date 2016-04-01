@@ -14,9 +14,9 @@
 #include "pawn.h"
 //#include "queen.h"
 //#include "rook.h"
-#include <vector>
+#include <deque>
 
-using std::vector;
+using std::deque;
 
 #define WHITE 0
 #define BLACK 1
@@ -35,7 +35,9 @@ class Board {
 		void handleEvent( SDL_Event* );
 	private:
 		// Private Data Members
-		vector<Piece*> pieces; // Chess Board
+		deque<Piece*> pieces; // Chess Board
+		deque<coord*> possMoves;
+		int selectID;         // location of selected piece in deque
 
 		// Private Helper Functions
 };
@@ -95,15 +97,11 @@ void Board::handleEvent( SDL_Event* e ) {
 
   //mouse click  
   if( e->type == SDL_MOUSEBUTTONDOWN ) {
-    
-    //deselect all
-    for(int i = 0; i < pieces.size(); i++)
-      pieces[i]->deselect();
 
     //mouse location
     int x, y, gridX, gridY;
     SDL_GetMouseState( &x, &y );
-    
+
     //find grid location of mouse
     for(int i = 1; i <= 8; i++)
       if( x < (SIDE/8)*i ) {
@@ -117,11 +115,49 @@ void Board::handleEvent( SDL_Event* e ) {
         break;
       }
 
+    //check if user chose to move
+    //look through possible moves
+    for(int i = 0; i < possMoves.size(); i++) {
+      int possX = (*possMoves[i])[0];
+      int possY = (*possMoves[i])[1];
+      if( possX == gridX && possY == gridY ) {
+        //move piece
+        coord newPos = { possX, possY };
+        pieces[selectID]->move(newPos);
+        for(int k = 0; k < possMoves.size(); k++)
+          delete[] possMoves[k];
+        possMoves.clear();
+
+        //check if captured piece
+        for( int k = 0; k < pieces.size(); k++)
+          if( (*pieces[k]->getPosition())[0] == possX &&
+              (*pieces[k]->getPosition())[1] == possY &&
+                selectID != k ) {
+            delete pieces[k];
+            pieces.erase(pieces.begin()+k);
+            break;
+          }
+
+        return;
+      }
+    }
+    
+    for(int i = 0; i < possMoves.size(); i++)
+      delete[] possMoves[i];
+
+    possMoves.clear();
+
+    //deselect all
+    for(int i = 0; i < pieces.size(); i++)
+      pieces[i]->deselect();
+
     //find piece to select
     for(int i = 0; i < pieces.size(); i++) {
       if( (*pieces[i]->getPosition())[0] == gridX && 
           (*pieces[i]->getPosition())[1] == gridY ) {
         pieces[i]->select();
+	possMoves = pieces[i]->findPossMoves( pieces );
+	selectID = i;
         break;
       }
     }
@@ -144,10 +180,21 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
 
       SDL_RenderFillRect( gRenderer, &fillRect );
     }
+  
+  //show possible moves
+  for(int i = 0; i < possMoves.size(); i++)
+    texture.render(gRenderer, SIDE/8*((*possMoves[i])[0]),
+                   SIDE/8*7-SIDE/8*((*possMoves[i])[1]), &clips[13]); 
 
-  //display pieces
+  //display selected piece so glow is in background
   for(int i = 0; i < pieces.size(); i++)
-    pieces[i]->display( gRenderer, texture, clips, SIDE );
+    if( pieces[i]->getSelected() )
+      pieces[i]->display( gRenderer, texture, clips, SIDE );
+
+  //display other pieces
+  for(int i = 0; i < pieces.size(); i++)
+    if( !pieces[i]->getSelected() )
+      pieces[i]->display( gRenderer, texture, clips, SIDE );
 
 }
 
