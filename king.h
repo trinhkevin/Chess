@@ -11,55 +11,34 @@ class King : public Piece {
 
 	public:
 		King(coord, bool);
-		//deque<int> getPossMoves();
+		virtual deque<coord*> getPossMoves(deque<Piece*>);
 	private:
 };
 
 King::King(coord nPosition, bool nColor) : Piece(king, nPosition, nColor) {
 }
-/*
-deque<coord> King::getPosition() {
+
+deque<coord*> King::getPossMoves( deque<Piece*> pieces) {
 
 	// Initialize Variables
-	coord position = getPosition();
-	coord nCoord;
-	i = position[0];
-	j = position[1];
-	deque<coord> possMoves;
+        deque<coord*> moves;
+        coord* ncoord;
+        int x = (*getPosition())[0];
+        int y = (*getPosition())[1];
 
-	// Up
-	nCoord = [i, j+1];
-	possMove.push_back(nCoord);
 
-	// Down
-	nCoord = [i, j-1];
-	possMove.push_back(nCoord);
+	for(int i = 0; i < 9; i++)
+          if( i != 4 ) {
 
-	// Left
-	nCoord = [i-1, j];
-	possMove.push_back(nCoord);
+	    ncoord = new coord[1];
+            (*ncoord)[0] = x-1+i%3; (*ncoord)[1] = y-1+i/3;
+            if( !checkSpace( ncoord, getColor(), pieces ) )
+              moves.push_back(ncoord);
+            else
+              delete[] ncoord;
+	  }
 
-	// Right
-	nCoord = [i+1, j];
-	possMove.push_back(nCoord);
-
-	// Top-Left
-	nCoord = [i-1, j+1];
-	possMove.push_back(nCoord);
-
-	// Top-Right
-	nCoord = [i+1, j+1];
-	possMove.push_back(nCoord);
-
-	// Bottom-Left
-	nCoord = [i-1, j-1];
-	possMove.push_back(nCoord);
-
-	// Bottom-Right
-	nCoord = [i+1, j-1];
-	possMove.push_back(nCoord);
-
-	return possMoves;
-}*/
+	return moves;
+}
 
 #endif

@@ -27,7 +27,7 @@ class Piece {
 		void select()		{ selected = true; }
 		bool getSelected() 	{ return selected; }
                 void deselect()		{ selected = false; }
-		virtual deque<coord*> findPossMoves(deque<Piece*>) = 0;
+		virtual deque<coord*> getPossMoves(deque<Piece*>) = 0;
 		bool checkSpace( coord*, bool, deque<Piece*> );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:

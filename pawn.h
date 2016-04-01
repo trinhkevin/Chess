@@ -10,14 +10,14 @@
 class Pawn : public Piece{
     public:
 	Pawn(coord, bool);
-	virtual deque<coord*> findPossMoves( deque<Piece*> );
+	virtual deque<coord*> getPossMoves( deque<Piece*> );
     private:
 };
 
 Pawn::Pawn(coord nPosition, bool nColor) : Piece(pawn, nPosition, nColor) {
 }
 
-deque<coord*> Pawn::findPossMoves( deque<Piece*> pieces ){
+deque<coord*> Pawn::getPossMoves( deque<Piece*> pieces ){
 
 	// Initialize Variables
 	deque<coord*> moves;

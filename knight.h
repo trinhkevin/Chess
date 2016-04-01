@@ -11,39 +11,79 @@ class Knight : public Piece {
 
 	public:
 		Knight(coord, bool);
-		//deque<coord> getPossMoves();
+		virtual deque<coord*> getPossMoves(deque<Piece*>);
 	private:
 };
 
 Knight::Knight(coord nPosition, bool nColor) : Piece(knight, nPosition, nColor) {
 }
-/*
-deque<coord> Knight::getPossMoves() {
+
+deque<coord*> Knight::getPossMoves(deque<Piece*> pieces) {
 
 	// Initialize Variables
-	coord position = getPosition();
-	coord nCoord;
-	int i = position[0];
-	int j = position[1];
-	deque<coord> possMoves;
+        deque<coord*> moves;
+        coord* ncoord;
+        int x = (*getPosition())[0];
+        int y = (*getPosition())[1];
 
-	// Up Right
-	nCoord = [i+1, j+2];
-	possMove.push_back(nCoord);
+        ncoord = new coord[1];
+        (*ncoord)[0] = x-1; (*ncoord)[1] = y-2;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
 
-	// Up Left
-	nCoord = [i-1, j+2];
-	possMove.push_back(nCoord);
+        ncoord = new coord[1];
+        (*ncoord)[0] = x-2; (*ncoord)[1] = y-1;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
 
-	// Down Right
-	nCoord = [i+1, j-2];
-	possMove.push_back(nCoord);
+        ncoord = new coord[1];
+        (*ncoord)[0] = x-2; (*ncoord)[1] = y+1;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
 
-	// Down Left
-	nCoord = [i-1, j-2];
-	possMove.push_back(nCoord);
+        ncoord = new coord[1];
+        (*ncoord)[0] = x-1; (*ncoord)[1] = y+2;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
 
-	return possMoves;
+        ncoord = new coord[1];
+        (*ncoord)[0] = x+1; (*ncoord)[1] = y+2;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
+
+        ncoord = new coord[1];
+        (*ncoord)[0] = x+2; (*ncoord)[1] = y+1;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
+
+        ncoord = new coord[1];
+        (*ncoord)[0] = x+2; (*ncoord)[1] = y-1;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
+
+        ncoord = new coord[1];
+        (*ncoord)[0] = x+1; (*ncoord)[1] = y-2;
+        if( !checkSpace( ncoord, getColor(), pieces ) )
+          moves.push_back(ncoord);
+        else
+          delete[] ncoord;
+
+        return moves;
+
 }
-*/
+
 #endif
