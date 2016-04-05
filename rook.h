@@ -11,7 +11,7 @@ class Rook : public Piece {
 
 	public:
 		Rook(coord, bool);
-		deque<coord*> getPossMoves( deque<Piece*> );
+		deque<coord> getPossMoves( deque<Piece*> );
 	private:
 		bool hasMoved = false;
 };
@@ -19,7 +19,7 @@ class Rook : public Piece {
 Rook::Rook(coord nPosition, bool nColor) : Piece(rook, nPosition, nColor) {
 }
 
-deque<coord*> Rook::getPossMoves( deque<Piece*> pieces ) {
+deque<coord> Rook::getPossMoves( deque<Piece*> pieces ) {
 
 	// The positions on this deque will be
 	// all positions on the board in the same
@@ -28,7 +28,7 @@ deque<coord*> Rook::getPossMoves( deque<Piece*> pieces ) {
 
 	// Initialize Variables
 
-	deque<coord*> moves;
+	deque<coord> moves;
 
         range( -1, 0, moves, pieces );
         range( 0, 1, moves, pieces );

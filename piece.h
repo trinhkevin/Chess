@@ -12,14 +12,19 @@ using std::deque;
 
 const int CLIPNUM = 14;
 enum pieceType{ king, queen, bishop, knight, rook, pawn };
-typedef int coord[2];
+
+struct coord
+{
+  int x;
+  int y;
+};
 
 class Piece {
 
 	public:
 		Piece(pieceType nType, coord nPosition, bool nColor);
 		~Piece() { deselect(); }
-		coord* getPosition()	{ return &position; }
+		coord getPosition()	{ return position; }
 		void move(coord nPosition);
 		pieceType getType()	{ return type; }
 		bool getHasMoved()	{ return hasMoved; }
@@ -27,10 +32,11 @@ class Piece {
 		void select()		{ selected = true; }
 		bool getSelected() 	{ return selected; }
                 void deselect()		{ selected = false; }
-		virtual deque<coord*> getPossMoves(deque<Piece*>) = 0;
-		bool checkSpace( coord*, bool, deque<Piece*> );
-		void range( int x, int y, deque<coord*>&, deque<Piece*> );
+		virtual deque<coord> getPossMoves(deque<Piece*>) = 0;
+		bool checkSpace( coord, bool, deque<Piece*> );
+		void range( int x, int y, deque<coord>&, deque<Piece*> );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
+		bool isLocated( int, int );
 	private:
 		coord position;
 		pieceType type;
@@ -41,41 +47,49 @@ class Piece {
 
 Piece::Piece(pieceType nType, coord nPosition, bool nColor) {
 	
-	position[0] = nPosition[0];
-	position[1] = nPosition[1];
+	position.x = nPosition.x;
+	position.y = nPosition.y;
 
 	type = nType;
 	color = nColor;
 }
 
-bool Piece::checkSpace( coord* space, bool col, deque<Piece*> pieces) {
+bool Piece::checkSpace( coord space, bool col, deque<Piece*> pieces) {
 
   bool blocked = false;
 
   for(int i = 0; i < pieces.size(); i++)
-    if( (*pieces[i]->getPosition())[0] == (*space)[0] &&
-        (*pieces[i]->getPosition())[1] == (*space)[1] &&
+    if( pieces[i]->getPosition().x == space.x &&
+        pieces[i]->getPosition().y == space.y &&
         pieces[i]->getColor() == col)
           blocked = true;
 
   return blocked;
 }
+		
+bool Piece::isLocated( int x, int y ) {
+
+  if( position.x == x && position.y == y )
+    return true;
+
+  return false;
+
+}
 
 void Piece::move(coord nPosition) {
-	position[0] = nPosition[0];
-	position[1] = nPosition[1];
+	position.x = nPosition.x;
+	position.y = nPosition.y;
 	hasMoved = true;
 	deselect();
 }
 
-void Piece::range( int x, int y, deque<coord*>& moves, deque<Piece*> pieces) {
+void Piece::range( int x, int y, deque<coord>& moves, deque<Piece*> pieces) {
 
   for( int i = 1; i <= 8; i++ ) {
-    coord* space = new coord[1];
-    (*space)[0] = (*getPosition())[0] + i*x;
-    (*space)[1] = (*getPosition())[1] + i*y;
+    coord space;
+    space.x = getPosition().x + i*x;
+    space.y = getPosition().y + i*y;
     if(checkSpace( space, getColor(), pieces)) {
-      delete space;
       return;
     }
     moves.push_back(space);
@@ -90,12 +104,12 @@ void Piece::display(SDL_Renderer* gRenderer, LTexture &texture,
 
   //glow and show moves if selected
   if(selected) 
-    texture.render(gRenderer, SIDE/8*(position[0]), 
-                   SIDE/8*7-SIDE/8*(position[1]), &clips[12]);
+    texture.render(gRenderer, SIDE/8*position.x, 
+                   SIDE/8*7-SIDE/8*position.y, &clips[12]);
 
   //render piece
-  texture.render(gRenderer, SIDE/8*(position[0]), 
-                 SIDE/8*7-SIDE/8*(position[1]), &clips[type + color*6]);
+  texture.render(gRenderer, SIDE/8*position.x, 
+                 SIDE/8*7-SIDE/8*position.y, &clips[type + color*6]);
 }
 
 #endif

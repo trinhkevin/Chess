@@ -30,59 +30,60 @@ class Board {
 		Board();
 		~Board();
 		// Member Functions
-		void play();
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM]);
 		void handleEvent( SDL_Event* );
 	private:
 		// Private Data Members
 		deque<Piece*> pieces; // Chess Board
-		deque<coord*> possMoves;
+		deque<coord> possMoves;
 		int selectID;         // location of selected piece in deque
+		bool turn = WHITE;
 
 		// Private Helper Functions
 };
 
 Board::Board(){
 
-  coord pos = {0,0};
+  coord pos;
+  pos.x = 0; pos.y = 0;
   pieces.push_back(new Rook(pos,WHITE));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Knight(pos,WHITE));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Bishop(pos,WHITE));
-  pos[0]++;
-  pieces.push_back(new King(pos,WHITE));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Queen(pos,WHITE));
-  pos[0]++;
+  pos.x++;
+  pieces.push_back(new King(pos,WHITE));
+  pos.x++;
   pieces.push_back(new Bishop(pos,WHITE));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Knight(pos,WHITE));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Rook(pos,WHITE));
 
-  pos[0] = 0; pos[1] = 7;
+  pos.x = 0; pos.y = 7;
   pieces.push_back(new Rook(pos,BLACK));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Knight(pos,BLACK));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Bishop(pos,BLACK));
-  pos[0]++;
-  pieces.push_back(new King(pos,BLACK));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Queen(pos,BLACK));
-  pos[0]++;
+  pos.x++;
+  pieces.push_back(new King(pos,BLACK));
+  pos.x++;
   pieces.push_back(new Bishop(pos,BLACK));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Knight(pos,BLACK));
-  pos[0]++;
+  pos.x++;
   pieces.push_back(new Rook(pos,BLACK));
 
   for(int i = 0; i < 8; i++)
   {
-    pos[0] = i; pos[1] = 1;
+    pos.x = i; pos.y = 1;
     pieces.push_back(new Pawn(pos,WHITE));
-    pos[1] = 6;
+    pos.y = 6;
     pieces.push_back(new Pawn(pos,BLACK));
   }
 }
@@ -96,72 +97,103 @@ Board::~Board() {
 void Board::handleEvent( SDL_Event* e ) {
 
   //mouse click  
-  if( e->type == SDL_MOUSEBUTTONDOWN ) {
+  if( e->type != SDL_MOUSEBUTTONDOWN )
+    return;
 
-    //mouse location
-    int x, y, gridX, gridY;
-    SDL_GetMouseState( &x, &y );
+  //mouse location
+  int x, y, gridX, gridY;
+  SDL_GetMouseState( &x, &y );
 
-    //find grid location of mouse
-    for(int i = 1; i <= 8; i++)
-      if( x < (SIDE/8)*i ) {
-        gridX = i-1;
-        break;
-      }
-
-    for(int i = 1; i <= 8; i++)
-      if( y < (SIDE/8)*i ) {
-        gridY = 8-i;
-        break;
-      }
-
-    //check if user chose to move
-    //look through possible moves
-    for(int i = 0; i < possMoves.size(); i++) {
-      int possX = (*possMoves[i])[0];
-      int possY = (*possMoves[i])[1];
-      if( possX == gridX && possY == gridY ) {
-        //move piece
-        coord newPos = { possX, possY };
-        pieces[selectID]->move(newPos);
-        for(int k = 0; k < possMoves.size(); k++)
-          delete[] possMoves[k];
-        possMoves.clear();
-
-        //check if captured piece
-        for( int k = 0; k < pieces.size(); k++)
-          if( (*pieces[k]->getPosition())[0] == possX &&
-              (*pieces[k]->getPosition())[1] == possY &&
-                selectID != k ) {
-            delete pieces[k];
-            pieces.erase(pieces.begin()+k);
-            break;
-          }
-
-        return;
-      }
+  //find grid location of mouse
+  for(int i = 1; i <= 8; i++)
+    if( x < (SIDE/8)*i ) {
+      gridX = i-1;
+      break;
     }
-    
-    for(int i = 0; i < possMoves.size(); i++)
-      delete[] possMoves[i];
 
-    possMoves.clear();
+  for(int i = 1; i <= 8; i++)
+    if( y < (SIDE/8)*i ) {
+      gridY = 8-i;
+      break;
+    }
 
-    //deselect all
-    for(int i = 0; i < pieces.size(); i++)
-      pieces[i]->deselect();
+  //check if user chose to move
 
-    //find piece to select
-    for(int i = 0; i < pieces.size(); i++) {
-      if( (*pieces[i]->getPosition())[0] == gridX && 
-          (*pieces[i]->getPosition())[1] == gridY ) {
-        pieces[i]->select();
-	possMoves = pieces[i]->getPossMoves( pieces );
-	selectID = i;
-        break;
+  //look through possible moves
+  for(int i = 0; i < possMoves.size(); i++) {
+    int possX = possMoves[i].x;
+    int possY = possMoves[i].y;
+    if( possX == gridX && possY == gridY ) {
+
+      coord newPos;
+
+      possMoves.clear();
+      //castling
+      if(pieces[selectID]->getType()==king )
+        if( possX - pieces[selectID]->getPosition().x > 1 ) {
+          for( int k = 0; k < pieces.size(); k++)
+            if( pieces[k]->isLocated( possX + 1, possY )) {
+              newPos.x = possX - 1;
+              newPos.y = possY;
+              pieces[k]->move(newPos);
+            }
+        }
+        else if( possX - pieces[selectID]->getPosition().x < -1 ) {
+          for( int k = 0; k < pieces.size(); k++)
+            if( pieces[k]->isLocated( possX - 2, possY )) {
+              newPos.x = possX + 1;
+              newPos.y = possY;
+              pieces[k]->move(newPos);
+            }
+        } 
+
+      //move piece
+      newPos.x = possX;
+      newPos.y = possY;
+      pieces[selectID]->move(newPos);
+
+      //promote pawns
+      if(pieces[selectID]->getType() == pawn && possY%7 == 0 ) {
+        bool c = pieces[selectID]->getColor();
+	delete pieces[selectID];
+	pieces[selectID] = new Queen(newPos, c);
       }
+
+      //check if captured piece
+      for( int k = 0; k < pieces.size(); k++)
+        if( pieces[k]->isLocated(possX, possY) && k != selectID ){
+          delete pieces[k];
+          pieces.erase(pieces.begin()+k);
+          break;
+        }
+
+      turn = !turn;
+      return;
     }
   }
+    
+  possMoves.clear();
+
+  for(int i = 0; i < pieces.size(); i++) //find piece to select
+    //if clicked on piece
+    if( pieces[i]->isLocated(gridX, gridY) && pieces[i]->getColor() == turn) {
+      if( pieces[i]->getSelected() ) {
+        pieces[i]->deselect();
+      }
+      else {
+        for(int i = 0; i < pieces.size(); i++) 
+          pieces[i]->deselect();
+        pieces[i]->select();
+        possMoves = pieces[i]->getPossMoves( pieces );
+        selectID = i;
+      }
+        
+      return;
+    }
+
+  for(int i = 0; i < pieces.size(); i++) 
+    pieces[i]->deselect();
+
 }
 
 void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[CLIPNUM]) {
@@ -183,8 +215,8 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
   
   //show possible moves
   for(int i = 0; i < possMoves.size(); i++)
-    texture.render(gRenderer, SIDE/8*((*possMoves[i])[0]),
-                   SIDE/8*7-SIDE/8*((*possMoves[i])[1]), &clips[13]); 
+    texture.render(gRenderer, SIDE/8*possMoves[i].x,
+                   SIDE/8*7-SIDE/8*possMoves[i].y, &clips[13]); 
 
   //display selected piece so glow is in background
   for(int i = 0; i < pieces.size(); i++)
@@ -195,10 +227,6 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
   for(int i = 0; i < pieces.size(); i++)
     if( !pieces[i]->getSelected() )
       pieces[i]->display( gRenderer, texture, clips, SIDE );
-
-}
-
-void Board::play() {
 
 }
 

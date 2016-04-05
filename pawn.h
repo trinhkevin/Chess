@@ -10,57 +10,45 @@
 class Pawn : public Piece{
     public:
 	Pawn(coord, bool);
-	virtual deque<coord*> getPossMoves( deque<Piece*> );
+	virtual deque<coord> getPossMoves( deque<Piece*> );
     private:
 };
 
 Pawn::Pawn(coord nPosition, bool nColor) : Piece(pawn, nPosition, nColor) {
 }
 
-deque<coord*> Pawn::getPossMoves( deque<Piece*> pieces ){
+deque<coord> Pawn::getPossMoves( deque<Piece*> pieces ){
 
 	// Initialize Variables
-	deque<coord*> moves;
-	coord* ncoord = new coord[1];
-	int x = (*getPosition())[0];
-	int y = (*getPosition())[1];
+	deque<coord> moves;
+	coord ncoord;
+	int x = getPosition().x;
+	int y = getPosition().y;
 
 	// Compute Moves
-	(*ncoord)[0] = x; (*ncoord)[1] = y+1-getColor()*2;
+	ncoord.x = x; ncoord.y = y+1-getColor()*2;
 	  
         if( !checkSpace( ncoord, getColor(), pieces ) && 
             !checkSpace( ncoord, !getColor(), pieces ))
           moves.push_back(ncoord);
-	else
-	  delete[] ncoord;
 	
 	if( moves.size()==1 && !getHasMoved()) {
-	  ncoord = new coord[1];
-	  (*ncoord)[0] = x; (*ncoord)[1] = y+2-getColor()*4;
+	  ncoord.x = x; ncoord.y = y+2-getColor()*4;
 
         if( !checkSpace( ncoord, getColor(), pieces ) &&
             !checkSpace( ncoord, !getColor(), pieces ))
-          moves.push_back(ncoord);
-	else
-	  delete[] ncoord;
-	  
+          moves.push_back(ncoord); 
 	}
 
-	ncoord = new coord[1];
-	(*ncoord)[0] = x-1; (*ncoord)[1] = y+1-getColor()*2;
+	ncoord.x = x-1; ncoord.y = y+1-getColor()*2;
 
 	if(checkSpace( ncoord, !getColor(), pieces ))
 	  moves.push_back(ncoord);
-	else
-	  delete[] ncoord;
 
-	ncoord = new coord[1];
-	(*ncoord)[0] = x+1; (*ncoord)[1] = y+1-getColor()*2;
+	ncoord.x = x+1; ncoord.y = y+1-getColor()*2;
 
 	if(checkSpace( ncoord, !getColor(), pieces ))
 	  moves.push_back(ncoord);
-	else
-	  delete[] ncoord;
 
 	return moves;
 }

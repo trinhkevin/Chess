@@ -11,21 +11,21 @@ class Queen : public Piece {
 
 	public:
 		Queen(coord, bool);
-		deque<coord*> getPossMoves( deque<Piece*> );
+		deque<coord> getPossMoves( deque<Piece*> );
 	private:
 };
 
 Queen::Queen(coord nPosition, bool nColor) : Piece(queen, nPosition, nColor) {
 }
 
-deque<coord*> Queen::getPossMoves( deque<Piece*> pieces ) {
+deque<coord> Queen::getPossMoves( deque<Piece*> pieces ) {
 
 	// This deque will contain all locations,
 	// on or off the board, that are less than
 	// a distance of 8 in all 8 directions from
 	// the Queen
 
-	deque<coord*> moves;
+	deque<coord> moves;
 
 	range( -1, 0, moves, pieces );
 	range( -1, 1, moves, pieces );
