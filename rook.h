@@ -11,15 +11,15 @@ class Rook : public Piece {
 
 	public:
 		Rook(coord, bool);
-		//deque<coord> getPossMoves();
+		deque<coord*> getPossMoves( deque<Piece*> );
 	private:
 		bool hasMoved = false;
 };
 
 Rook::Rook(coord nPosition, bool nColor) : Piece(rook, nPosition, nColor) {
 }
-/*
-deque<coord> Rook::getPossMoves() {
+
+deque<coord*> Rook::getPossMoves( deque<Piece*> pieces ) {
 
 	// The positions on this deque will be
 	// all positions on the board in the same
@@ -27,22 +27,16 @@ deque<coord> Rook::getPossMoves() {
 	// the piece's current position
 
 	// Initialize Variables
-	pos = getPosition();
-  	int x = pos[0];
-  	int y = pos[1];
-  	deque<coord> possMoves;
 
-	// Compute Possible Moves
-  	for(int counter=0; counter < 8; ++ counter) {
-    		if (counter != x) {
-			possMoves.push_back([x, counter]);
-		}
-    		if (counter != y) {
-			possMoves.push_back([counter, y]);
-		}
-	}
+	deque<coord*> moves;
 
-	return possMoves;
+        range( -1, 0, moves, pieces );
+        range( 0, 1, moves, pieces );
+        range( 1, 0, moves, pieces );
+        range( 0, -1, moves, pieces );
+
+        return moves;
+
 }
-*/
+
 #endif

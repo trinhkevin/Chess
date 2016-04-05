@@ -11,34 +11,28 @@ class Bishop : public Piece {
 
 	public:
 		Bishop(coord, bool);
-		//deque<coord> getPossMoves();
+		deque<coord*> getPossMoves( deque<Piece*> );
 	private:
 };
 
 Bishop::Bishop(coord nPosition, bool nColor) : Piece(bishop, nPosition, nColor) {
 }
-/*
-deque<coord> Bishop::getPossMoves() {
+
+deque<coord*> Bishop::getPossMoves( deque<Piece*> pieces ) {
 
 	// This deque will contain all locations, on or off
 	// the board, that are less than a distance of 8 in
 	// all four diagonal directions from the bishop
 
 	// Initialize Variables
-	pos = getPosition();
-	int x = pos[0];
-	int y = pos[1];
-	deque<coord> possMoves;
+	deque<coord*> moves;
 
-	// Loop and Find Possible Moves
-	for(int i = 1; i < 8; ++i) {
-		possMoves.push_back([x+i, y+i]);
-		possMoves.push_back([x+i, y-i]);
-		possMoves.push_back([x-i, y+i]);
-		possMoves.push_back([x-i, y-i]);
-	}
+        range( -1, 1, moves, pieces );
+        range( 1, 1, moves, pieces );
+        range( 1, -1, moves, pieces );
+        range( -1, -1, moves, pieces );
 
-	return possMoves;
+        return moves;
 }
-*/
+
 #endif

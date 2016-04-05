@@ -8,12 +8,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "piece.h"
-//#include "bishop.h"
+#include "bishop.h"
 #include "king.h"
 #include "knight.h"
 #include "pawn.h"
-//#include "queen.h"
-//#include "rook.h"
+#include "queen.h"
+#include "rook.h"
 #include <deque>
 
 using std::deque;
@@ -45,38 +45,38 @@ class Board {
 Board::Board(){
 
   coord pos = {0,0};
-//  pieces.push_back(new Rook(pos,WHITE));
+  pieces.push_back(new Rook(pos,WHITE));
   pos[0]++;
   pieces.push_back(new Knight(pos,WHITE));
   pos[0]++;
-//  pieces.push_back(new Bishop(pos,WHITE));
+  pieces.push_back(new Bishop(pos,WHITE));
   pos[0]++;
   pieces.push_back(new King(pos,WHITE));
   pos[0]++;
-//  pieces.push_back(new Queen(pos,WHITE));
+  pieces.push_back(new Queen(pos,WHITE));
   pos[0]++;
-//  pieces.push_back(new Bishop(pos,WHITE));
+  pieces.push_back(new Bishop(pos,WHITE));
   pos[0]++;
   pieces.push_back(new Knight(pos,WHITE));
   pos[0]++;
-//  pieces.push_back(new Rook(pos,WHITE));
+  pieces.push_back(new Rook(pos,WHITE));
 
   pos[0] = 0; pos[1] = 7;
-//  pieces.push_back(new Rook(pos,BLACK));
+  pieces.push_back(new Rook(pos,BLACK));
   pos[0]++;
   pieces.push_back(new Knight(pos,BLACK));
   pos[0]++;
-//  pieces.push_back(new Bishop(pos,BLACK));
+  pieces.push_back(new Bishop(pos,BLACK));
   pos[0]++;
   pieces.push_back(new King(pos,BLACK));
   pos[0]++;
-//  pieces.push_back(new Queen(pos,BLACK));
+  pieces.push_back(new Queen(pos,BLACK));
   pos[0]++;
-//  pieces.push_back(new Bishop(pos,BLACK));
+  pieces.push_back(new Bishop(pos,BLACK));
   pos[0]++;
   pieces.push_back(new Knight(pos,BLACK));
   pos[0]++;
-//  pieces.push_back(new Rook(pos,BLACK));
+  pieces.push_back(new Rook(pos,BLACK));
 
   for(int i = 0; i < 8; i++)
   {

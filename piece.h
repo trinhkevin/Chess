@@ -29,6 +29,7 @@ class Piece {
                 void deselect()		{ selected = false; }
 		virtual deque<coord*> getPossMoves(deque<Piece*>) = 0;
 		bool checkSpace( coord*, bool, deque<Piece*> );
+		void range( int x, int y, deque<coord*>&, deque<Piece*> );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
 		coord position;
@@ -65,6 +66,23 @@ void Piece::move(coord nPosition) {
 	position[1] = nPosition[1];
 	hasMoved = true;
 	deselect();
+}
+
+void Piece::range( int x, int y, deque<coord*>& moves, deque<Piece*> pieces) {
+
+  for( int i = 1; i <= 8; i++ ) {
+    coord* space = new coord[1];
+    (*space)[0] = (*getPosition())[0] + i*x;
+    (*space)[1] = (*getPosition())[1] + i*y;
+    if(checkSpace( space, getColor(), pieces)) {
+      delete space;
+      return;
+    }
+    moves.push_back(space);
+
+    if(checkSpace( space, !getColor(), pieces))
+      return;
+  }
 }
 
 void Piece::display(SDL_Renderer* gRenderer, LTexture &texture, 
