@@ -28,15 +28,7 @@ deque<coord> King::getPossMoves( Piece* spaces[8][8]) {
 
 
 	for(int i = 0; i < 9; i++)
-          if( i != 4 ) {
-
-            ncoord.x = x-1+i%3; ncoord.y = y-1+i/3;
-            //on board
-            if( ncoord.x >= 0 && ncoord.x < 8 && ncoord.y >= 0 && ncoord.y < 8)
-              if( spaces[ncoord.x][ncoord.y] ==NULL ||
-                  spaces[ncoord.x][ncoord.y]->getColor() != getColor() )
-                moves.push_back(ncoord);
-	  }
+	  scan( i%3 - 1, i/3 - 1, 1, moves, spaces );
 
         //castling
 	if( !getHasMoved() ) {

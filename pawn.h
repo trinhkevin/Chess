@@ -29,14 +29,11 @@ deque<coord> Pawn::getPossMoves( Piece* spaces[8][8] ){
 	// Compute Moves
 	ncoord.x = x; ncoord.y = y+1-getColor()*2;
 	  
-        if( spaces[ncoord.x][ncoord.y] == NULL )
+        if( spaces[ncoord.x][ncoord.y] == NULL ) {
           moves.push_back(ncoord);
-	
-	if( moves.size()==1 && !getHasMoved()) {
 	  ncoord.x = x; ncoord.y = y+2-getColor()*4;
-
-          if( spaces[ncoord.x][ncoord.y] == NULL )
-            moves.push_back(ncoord); 
+	  if(!getHasMoved()&&spaces[ncoord.x][ncoord.y] == NULL )
+            moves.push_back(ncoord);
 	}
 
 	ncoord.x = x-1; ncoord.y = y+1-getColor()*2;

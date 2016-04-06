@@ -30,10 +30,10 @@ deque<coord> Rook::getPossMoves( Piece* spaces[8][8] ) {
 
 	deque<coord> moves;
 
-        range( -1, 0, moves, spaces );
-        range( 0, 1, moves, spaces );
-        range( 1, 0, moves, spaces );
-        range( 0, -1, moves, spaces );
+        scan( -1, 0, 7, moves, spaces );
+        scan( 0, 1, 7, moves, spaces );
+        scan( 1, 0, 7, moves, spaces );
+        scan( 0, -1, 7, moves, spaces );
 
         return moves;
 

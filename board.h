@@ -42,6 +42,7 @@ class Board {
 
 		// Private Helper Functions
 		void addPiece(Piece*);
+		void movePiece(Piece*,coord);
 		void removePiece(Piece*);
 };
 
@@ -108,13 +109,20 @@ void Board::addPiece( Piece* newPiece ) {
 
 }
 
-void Board::removePiece( Piece* takePiece ) {
+void Board::removePiece( Piece* capturedPiece ) {
 
-  delete takePiece;
+  delete capturedPiece;
 
   for(int i = 0; i < pieces.size(); i++)
-    if(pieces[i] == takePiece)
+    if(pieces[i] == capturedPiece)
       pieces.erase(pieces.begin()+i);
+}
+
+void Board::movePiece( Piece* piece, coord newPos ) {
+
+      spaces[piece->getPosition().x][piece->getPosition().y] = NULL;
+      piece->move(newPos);
+      spaces[piece->getPosition().x][piece->getPosition().y] = piece;
 }
 
 void Board::handleEvent( SDL_Event* e ) {
@@ -143,64 +151,62 @@ void Board::handleEvent( SDL_Event* e ) {
   //check if user chose to move
 
   //look through possible moves
-  for(int i = 0; i < possMoves.size(); i++) {
-    int x = possMoves[i].x;
-    int y = possMoves[i].y;
-    if( x == gridX && y == gridY ) {
+  coord* selectedMove = NULL;
 
-      possMoves.clear();
-      //castling
-      if(chosen->getType()==king ) {
-        coord rookPos;
+  for(int i = 0; i < possMoves.size(); i++)
+    if( possMoves[i].x == gridX && possMoves[i].y == gridY )
+      selectedMove = &possMoves[i];
 
-        if( x - chosen->getPosition().x > 1 ) {
-          rookPos.x = x - 1;
-          rookPos.y = y;
-          spaces[x+1][y]->move(rookPos);
-        }
-        else if( x - chosen->getPosition().x < -1 ) {
-          rookPos.x = x + 1;
-          rookPos.y = y;
-          spaces[x -2][y]->move(rookPos);
-        }
-      } 
-
-      //move piece
-      spaces[chosen->getPosition().x][chosen->getPosition().y] = NULL;
-      chosen->move(possMoves[i]);
-
-      //promote pawns
-      if(chosen->getType() == pawn && y%7 == 0 ) {
-        bool c = chosen->getColor();
-        delete chosen;
-        chosen = new Queen(possMoves[i], c);
-      }
-
-      //check if captured piece
-      if( spaces[x][y] != NULL && spaces[x][y] != chosen )
-        removePiece( spaces[x][y] );
-
-      //associate space and deselect
-      spaces[x][y] = chosen;
-      chosen = NULL;
-
-      //next turn
-      turn = !turn;
-      return;
-    }
-  }
-    
   possMoves.clear();
+  
+  if(selectedMove != NULL) {
+ 
+    int x = (*selectedMove).x;
+    int y = (*selectedMove).y;
 
-  if( spaces[gridX][gridY] == NULL || spaces[gridX][gridY]->getColor() != turn)
-  {
+    //castling
+    if(chosen->getType()==king ) {
+      coord rookPos;
+
+      if( x - chosen->getPosition().x > 1 ) {
+        rookPos.x = x - 1;
+        rookPos.y = y;
+        movePiece(spaces[x+1][y],rookPos); 
+      }
+      else if( x - chosen->getPosition().x < -1 ) {
+        rookPos.x = x + 1;
+        rookPos.y = y;
+        movePiece(spaces[x -2][y],rookPos);
+      }
+    }
+ 
+    //check if captured piece
+    if( spaces[x][y] != NULL )
+      removePiece( spaces[x][y] );
+
+    movePiece(chosen,*selectedMove);
+
+    //promote pawns
+    if(chosen->getType() == pawn && y%7 == 0 ) {
+      bool c = chosen->getColor();
+      delete chosen;
+      chosen = new Queen(*selectedMove, c);
+    }
+
+    //deselect
     chosen = NULL;
+
+    //next turn
+    turn = !turn;
     return;
   }
-
-  if( spaces[gridX][gridY] == chosen )
+    
+  //clicked empty or opponent space
+  if( spaces[gridX][gridY] == NULL || spaces[gridX][gridY]->getColor() != turn)
     chosen = NULL;
-  else {
+  else if( spaces[gridX][gridY] == chosen )  //clicked selected piece
+    chosen = NULL;
+  else {                                     //selected new piece
     chosen = spaces[gridX][gridY];
     possMoves = chosen->getPossMoves( spaces );
   }

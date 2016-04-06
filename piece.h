@@ -29,7 +29,7 @@ class Piece {
 		bool getHasMoved()const { return hasMoved; }
 		bool getColor()const	{ return color; }
 		virtual deque<coord> getPossMoves( Piece*[8][8]) = 0;
-		void range(int,int, deque<coord>&, Piece*[8][8] );
+		void scan(int,int,int,deque<coord>&, Piece*[8][8] );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
 		coord position;
@@ -46,9 +46,10 @@ void Piece::move(coord nPosition) {
 	hasMoved = true;
 }
 
-void Piece::range(int x,int y,deque<coord>& moves, Piece* spaces[8][8]) {
+void Piece::scan(int x,int y,int range,deque<coord>& moves,Piece* spaces[8][8])
+{
 
-  for( int i = 1; i <= 8; i++ ) {
+  for( int i = 1; i <= range; i++ ) {
     coord space;
     space.x = position.x + i*x;
     space.y = position.y + i*y;

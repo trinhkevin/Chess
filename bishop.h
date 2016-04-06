@@ -27,10 +27,10 @@ deque<coord> Bishop::getPossMoves( Piece* spaces[8][8]) {
 	// Initialize Variables
 	deque<coord> moves;
 
-        range( -1, 1, moves, spaces );
-        range( 1, 1, moves, spaces );
-        range( 1, -1, moves, spaces );
-        range( -1, -1, moves, spaces );
+        scan( -1,  1, 7, moves, spaces );
+        scan(  1,  1, 7, moves, spaces );
+        scan(  1, -1, 7, moves, spaces );
+        scan( -1, -1, 7, moves, spaces );
 
         return moves;
 }
