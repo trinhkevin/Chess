@@ -118,11 +118,37 @@ void Board::removePiece( Piece* capturedPiece ) {
       pieces.erase(pieces.begin()+i);
 }
 
-void Board::movePiece( Piece* piece, coord newPos ) {
+void Board::movePiece( Piece* piece, coord moveTo ) {
 
-      spaces[piece->getPosition().x][piece->getPosition().y] = NULL;
-      piece->move(newPos);
-      spaces[piece->getPosition().x][piece->getPosition().y] = piece;
+  //castling
+  if(piece->getType()==king && !piece->getHasMoved()) {
+    coord rookPos = moveTo;
+    rookPos.x--;
+    //right
+    if( moveTo.x == 6 )
+      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos);
+ 
+    rookPos.x++;
+    //left
+    if( moveTo.x == 2 )
+      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos);
+  }
+
+  //check if captured piece
+  if( spaces[moveTo.x][moveTo.y] != NULL )
+    removePiece( spaces[moveTo.x][moveTo.y] );
+
+  //move piece
+  spaces[piece->getPosition().x][piece->getPosition().y] = NULL;
+  piece->move(moveTo);
+  spaces[moveTo.x][moveTo.y] = piece;
+
+  //promote pawns
+  if(piece->getType() == pawn && moveTo.y%7 == 0 ) {
+    bool c = piece->getColor();
+    delete piece;
+    piece = new Queen(moveTo, c);
+  }
 }
 
 void Board::handleEvent( SDL_Event* e ) {
@@ -132,66 +158,37 @@ void Board::handleEvent( SDL_Event* e ) {
     return;
 
   //mouse location
-  int mouseX, mouseY, gridX, gridY;
+  coord click;
+  int mouseX, mouseY;
   SDL_GetMouseState( &mouseX, &mouseY );
 
   //find grid location of mouse
   for(int i = 1; i <= 8; i++)
     if( mouseX < (SIDE/8)*i ) {
-      gridX = i-1;
+      click.x = i-1;
       break;
     }
 
   for(int i = 1; i <= 8; i++)
     if( mouseY < (SIDE/8)*i ) {
-      gridY = 8-i;
+      click.y = 8-i;
       break;
     }
 
   //check if user chose to move
 
   //look through possible moves
-  coord* selectedMove = NULL;
+  bool move = false;
 
   for(int i = 0; i < possMoves.size(); i++)
-    if( possMoves[i].x == gridX && possMoves[i].y == gridY )
-      selectedMove = &possMoves[i];
+    if( possMoves[i].x == click.x && possMoves[i].y == click.y )
+      move = true;
 
   possMoves.clear();
   
-  if(selectedMove != NULL) {
+  if(move) {
  
-    int x = (*selectedMove).x;
-    int y = (*selectedMove).y;
-
-    //castling
-    if(chosen->getType()==king ) {
-      coord rookPos;
-
-      if( x - chosen->getPosition().x > 1 ) {
-        rookPos.x = x - 1;
-        rookPos.y = y;
-        movePiece(spaces[x+1][y],rookPos); 
-      }
-      else if( x - chosen->getPosition().x < -1 ) {
-        rookPos.x = x + 1;
-        rookPos.y = y;
-        movePiece(spaces[x -2][y],rookPos);
-      }
-    }
- 
-    //check if captured piece
-    if( spaces[x][y] != NULL )
-      removePiece( spaces[x][y] );
-
-    movePiece(chosen,*selectedMove);
-
-    //promote pawns
-    if(chosen->getType() == pawn && y%7 == 0 ) {
-      bool c = chosen->getColor();
-      delete chosen;
-      chosen = new Queen(*selectedMove, c);
-    }
+    movePiece(chosen,click);
 
     //deselect
     chosen = NULL;
@@ -202,12 +199,13 @@ void Board::handleEvent( SDL_Event* e ) {
   }
     
   //clicked empty or opponent space
-  if( spaces[gridX][gridY] == NULL || spaces[gridX][gridY]->getColor() != turn)
+  if( spaces[click.x][click.y] == NULL )
     chosen = NULL;
-  else if( spaces[gridX][gridY] == chosen )  //clicked selected piece
+  else if( spaces[click.x][click.y] == chosen ||  //clicked selected piece
+           spaces[click.x][click.y]->getColor() != turn )
     chosen = NULL;
-  else {                                     //selected new piece
-    chosen = spaces[gridX][gridY];
+  else {                                          //selected new piece
+    chosen = spaces[click.x][click.y];
     possMoves = chosen->getPossMoves( spaces );
   }
 }
