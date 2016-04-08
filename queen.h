@@ -11,14 +11,14 @@ class Queen : public Piece {
 
 	public:
 		Queen(coord, bool);
-	        virtual deque<coord> getPossMoves( Piece* [8][8] );
+	        virtual deque<coord> getPossMoves( Piece* [8][8], Piece* );
 	private:
 };
 
 Queen::Queen(coord nPosition, bool nColor) : Piece(queen, nPosition, nColor) {
 }
 
-deque<coord> Queen::getPossMoves( Piece* spaces[8][8]) {
+deque<coord> Queen::getPossMoves( Piece* spaces[8][8], Piece* enPass) {
 
 	// This deque will contain all locations,
 	// on or off the board, that are less than

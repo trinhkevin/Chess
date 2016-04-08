@@ -11,14 +11,14 @@ class King : public Piece {
 
 	public:
 		King(coord, bool);
-	        virtual deque<coord> getPossMoves( Piece* [8][8] );
+	        virtual deque<coord> getPossMoves( Piece* [8][8], Piece* );
 	private:
 };
 
 King::King(coord nPosition, bool nColor) : Piece(king, nPosition, nColor) {
 }
 
-deque<coord> King::getPossMoves( Piece* spaces[8][8]) {
+deque<coord> King::getPossMoves( Piece* spaces[8][8], Piece* enPass) {
 
 	// Initialize Variables
         deque<coord> moves;

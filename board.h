@@ -38,6 +38,7 @@ class Board {
 		deque<coord> possMoves;
                 Piece* spaces[8][8];
 		Piece* chosen = NULL; // selected piece
+		Piece* enPass = NULL; //pawn that just moved two spaces
 		bool turn = WHITE;
 
 		// Private Helper Functions
@@ -138,6 +139,21 @@ void Board::movePiece( Piece* piece, coord moveTo ) {
   if( spaces[moveTo.x][moveTo.y] != NULL )
     removePiece( spaces[moveTo.x][moveTo.y] );
 
+  if( piece->getType() == pawn ) {
+
+    //check if attacking enPassant
+    if( enPass != NULL && 
+        enPass == spaces[moveTo.x][moveTo.y+1-enPass->getColor()*2])
+      removePiece( enPass );
+
+    //check for new enPassant
+    if( moveTo.y - piece->getPosition().y == 2 ||
+        moveTo.y - piece->getPosition().y ==-2 )
+      enPass = piece;
+    else
+      enPass = NULL;
+  }
+
   //move piece
   spaces[piece->getPosition().x][piece->getPosition().y] = NULL;
   piece->move(moveTo);
@@ -179,7 +195,6 @@ void Board::handleEvent( SDL_Event* e ) {
 
   //look through possible moves
   bool move = false;
-
   for(int i = 0; i < possMoves.size(); i++)
     if( possMoves[i].x == click.x && possMoves[i].y == click.y )
       move = true;
@@ -206,7 +221,7 @@ void Board::handleEvent( SDL_Event* e ) {
     chosen = NULL;
   else {                                          //selected new piece
     chosen = spaces[click.x][click.y];
-    possMoves = chosen->getPossMoves( spaces );
+    possMoves = chosen->getPossMoves( spaces, enPass);
   }
 }
 
@@ -232,11 +247,12 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
     texture.render(gRenderer, SIDE/8*possMoves[i].x,
                    SIDE/8*7-SIDE/8*possMoves[i].y, &clips[13]); 
 
+  //show selected glow
   if(chosen != NULL )
     texture.render(gRenderer, SIDE/8*chosen->getPosition().x,
                    SIDE/8*7-SIDE/8*chosen->getPosition().y, &clips[12]); 
 
-  //display other pieces
+  //display pieces
   for(int i = 0; i < pieces.size(); i++)
     pieces[i]->display( gRenderer, texture, clips, SIDE );
 

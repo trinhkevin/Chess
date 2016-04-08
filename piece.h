@@ -24,11 +24,11 @@ class Piece {
 	public:
 		Piece(pieceType, coord, bool nColor );
 		coord getPosition()	{ return position; }
-		void move(coord nPosition);
+		void move(coord);
 		pieceType getType()const{ return type; }
 		bool getHasMoved()const { return hasMoved; }
 		bool getColor()const	{ return color; }
-		virtual deque<coord> getPossMoves( Piece*[8][8]) = 0;
+		virtual deque<coord> getPossMoves( Piece*[8][8],Piece*) = 0;
 		void scan(int,int,int,deque<coord>&, Piece*[8][8] );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
