@@ -45,6 +45,7 @@ class Board {
 		void addPiece(Piece*);
 		void movePiece(Piece*,coord);
 		void removePiece(Piece*);
+		bool checkCheck(bool);
 };
 
 Board::Board(){
@@ -257,5 +258,27 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
     pieces[i]->display( gRenderer, texture, clips, SIDE );
 
 }
+
+bool Board::checkCheck(bool color) {
+  //find location of king
+  int i,j;
+  coord LocK;
+  for (i = 0; i < pieces.size(); i++) {
+    if (pieces[i]->getType() == king && pieces[i]->getColor() == color) {
+      LocK = pieces[i]->getPosition();
+    }
+  }
+  //see if this matches any possible moves from other team
+  deque<coord> tempPossMoves;
+  for (i = 0; i < pieces.size(); i++) {
+    if ( pieces[i]->getColor() != color) {
+      for (j = 0; j < pieces[i]->getPossMoves(spaces, enPass).size(); j++) {
+	if (pieces[i]->getPossMoves(spaces, enPass)[j] == LocK)
+	  return 1;
+      }
+    }
+  } 
+}
+
 
 #endif

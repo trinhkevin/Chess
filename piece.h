@@ -17,7 +17,16 @@ struct coord
 {
   int x;
   int y;
+
+  inline bool operator==(coord a) {
+    if (a.x==x && a.y== y)
+      return true;
+    else
+      return false;
+  }
+
 };
+
 
 class Piece {
 
