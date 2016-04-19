@@ -132,7 +132,7 @@ void Board::removePiece(Piece* capturedPiece) {
 }
 
 bool Board::movePiece(Piece* piece, coord moveTo) {
-
+      
   // Castling
   if(piece->getType()==king && !piece->getHasMoved()) {
     coord rookPos = moveTo;
@@ -303,7 +303,8 @@ bool Board::checkCheck(bool color) {
 	                return 1;
             }
         }
-    } 
+    }
+
     return 0;
 }
 
