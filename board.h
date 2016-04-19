@@ -156,9 +156,17 @@ void Board::movePiece( Piece* piece, coord moveTo ) {
   }
 
   //move piece
-  spaces[piece->getPosition().x][piece->getPosition().y] = NULL;
+  coord origPos = piece->getPosition();
+  spaces[origPos.x][origPos.y] = NULL;
   piece->move(moveTo);
   spaces[moveTo.x][moveTo.y] = piece;
+  
+  //preventing move into check...
+  if (checkCheck(piece->getColor())) {
+    spaces[moveTo.x][moveTo.y] = NULL;
+    piece->move(origPos);
+    spaces[origPos.x][origPos.y] = piece;
+  }
 
   //promote pawns
   if(piece->getType() == pawn && moveTo.y%7 == 0 ) {
@@ -278,7 +286,10 @@ bool Board::checkCheck(bool color) {
       }
     }
   } 
+  return 0;
 }
+
+
 
 
 #endif
