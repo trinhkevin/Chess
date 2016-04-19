@@ -22,8 +22,8 @@ Implementation
 
 This game will include:
 
-* Full Implementation of Chess
-* AI
-* Graphics Utilizing SDL2
+* Full Implementation of Chess (almost complete)
+* AI (beginning)
+* Graphics Utilizing SDL2 (done)
 
 *This is currently a WIP.*
