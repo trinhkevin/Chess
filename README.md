@@ -6,7 +6,7 @@ This is a repository for [CSE-20212] project **Chess**.
 Screenshot: 
 ![alt text][logo]
 
-[logo]: https://bitbucket.org/ktrinh1/chess/src/e5472bc10990390d00af80d09a52dc30ca1af2f3/pic.png?at=master&fileviewer=file-view-default "Logo Title Text 1"
+[logo]: https://bitbucket.org/ktrinh1/chess/src/e5472bc10990390d00af80d09a52dc30ca1af2f3/pic.png?at=master&fileviewer=file-view-default "Chess Screenshot"
 
 **Members**:
 
