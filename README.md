@@ -3,7 +3,6 @@ Chess
 
 This is a repository for [CSE-20212] project **Chess**.
 
-Screenshot: 
 ![alt text][logo]
 
 [logo]: https://bytebucket.org/ktrinh1/chess/raw/c8eb2cac4c00bde455854f7f60607b80b741195b/pic.png?token=3f213f6eff6fd0cac3afa0c8d7eba2798d22f39a
