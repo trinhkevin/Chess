@@ -51,6 +51,7 @@ class Board {
 		bool movePiece(Piece*,coord);
 		void removePiece(Piece*);
 		bool checkCheck(bool);
+		bool checkCheckMate(bool);
 };
 
 Board::Board() {
@@ -299,11 +300,24 @@ bool Board::checkCheck(bool color) {
         if (pieces[i]->getColor() != color) {
             for (j = 0; j < pieces[i]->getPossMoves(spaces, enPass).size(); j++) {
 	            if (pieces[i]->getPossMoves(spaces, enPass)[j] == LocK)
-	            return 1;
+	                return 1;
             }
         }
     } 
     return 0;
 }
+
+/*
+bool Board::checkCheckmate(bool color) {
+        if(checkCheck(color)) {
+                for(int i = 0; i < pieces.size(); i++) {
+                        if(pieces[i]->getColor() != color) {
+                                for(int j = 0; j < pieces[i]->getPossMoves(spaces, enPass).size(); j++) {
+                                        if(move)
+                                }        
+                        }
+                }
+        }
+}*/
 
 #endif
