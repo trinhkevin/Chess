@@ -1,7 +1,0 @@
-I have spent about 8 hours programming graphics, mostly during the weekend of March 18 and on March 30.
-The group mostly meets before and after CSE classes since we have them all together.
-
-I worked on implementing the board and pieces on the screen. I have given each chess piece class its own display
-function that shows the correct piece wherever it is on the board. Recently, I added mouse functionality so
-you can select a piece and it will glow with a yellow background. I am now trying to add an indicator for a selected
-piece's possible moves. I have learned a lot about SDL events, rendering, and pointers which are important to both.

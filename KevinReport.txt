@@ -1,8 +1,0 @@
-Report
-Kevin Trinh
-
-We've all worked on the program 6-7 hours so far. Brian, Troy, and I have implemented the foundations of the game while David has written code that has successfully displayed the board and pieces so far.
-
-We've realized that this program is going to be a lot harder than we thought it would be and are prepared for that. We now hope to have a working game in the coming weeks. After that, we'll start on the AI computer.
-
-

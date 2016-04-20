@@ -1,0 +1,30 @@
+Report - 04/19/16            |
+Fundamentals of Computing II |
+Chess                        |
+_____________________________|
+
+Hours Total
+------------
+
+Brian Byrne: 15
+David Mellitt: 22
+Troy Prince: 15
+Kevin Trinh: 15
+
+Summary
+------------
+
+At the moment, we have most of the Chess game complete.
+There are some bugs such as some issues with en passant,
+some issues with capturing pieces while in check, and
+displaying possible moves while in check. We are also in
+the midst of creating an AI that can access the our board
+by being a friend class.
+
+Goals
+------------
+
+In the coming weeks we can to achieve:
+
+- Fully working Chess with no issues/glitches
+- AI (?)
