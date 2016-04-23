@@ -176,6 +176,17 @@ int main( int argc, char* args[] )
 
       Board chessBoard;
 
+      //Clear screen
+      SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+      SDL_RenderClear( gRenderer );
+
+      chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
+
+      //Update screen
+      SDL_RenderPresent( gRenderer );
+
+      bool gameOver = false;
+
       //While application is running
       while( !quit )
       {
@@ -185,22 +196,27 @@ int main( int argc, char* args[] )
           //User requests quit
           if( e.type == SDL_QUIT )
             quit = true;
+          // Mouse Click  
+          if(!gameOver && e.type == SDL_MOUSEBUTTONDOWN) {
+       
+            chessBoard.handleEvent( &e );
 
-          chessBoard.handleEvent( &e );
-        }
+	    if( chessBoard.noMoves() )
+	      gameOver = true;
 
-        //Clear screen
-        SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-        SDL_RenderClear( gRenderer );
+            //Clear screen
+            SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+            SDL_RenderClear( gRenderer );
         
-        chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
+            chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
 
-        //Update screen
-        SDL_RenderPresent( gRenderer );
+            //Update screen
+            SDL_RenderPresent( gRenderer );
+          }
+        }
       }
     }
   }
-
   //Free resources and close SDL
   close();
 

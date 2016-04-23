@@ -7,10 +7,9 @@
 
 #include "LTexture.h"
 #include <deque>
-
 using std::deque;
 
-const int CLIPNUM = 14;
+const int CLIPNUM = 17;
 enum pieceType{ king, queen, bishop, knight, rook, pawn };
 
 struct coord
@@ -33,7 +32,8 @@ class Piece {
 	public:
 		Piece(pieceType, coord, bool nColor );
 		coord getPosition()	{ return position; }
-		void move(coord);
+		void move(coord, Piece* [8][8]);
+		void revert(Piece*[8][8]);
 		pieceType getType()const{ return type; }
 		bool getHasMoved()const { return hasMoved; }
 		bool getColor()const	{ return color; }
@@ -42,17 +42,37 @@ class Piece {
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
 		coord position;
+		coord lastPosition;
 		pieceType type;
 		bool color;
 		bool hasMoved = false;
+		bool firstMove = true;
 };
 
 Piece::Piece(pieceType nType, coord nPosition, bool nColor)
       : position(nPosition), type(nType), color(nColor) {}
 
-void Piece::move(coord nPosition) {
+void Piece::move(coord nPosition, Piece* spaces[8][8]) {
+
+	lastPosition = position;
+	spaces[position.x][position.y] = NULL;
 	position = nPosition;
+	spaces[position.x][position.y] = this;
+
+	if(hasMoved)
+		firstMove = false;
+
 	hasMoved = true;
+}
+
+void Piece::revert(Piece* spaces[8][8]) {
+
+	spaces[position.x][position.y] = NULL;
+	position = lastPosition;
+	spaces[position.x][position.y] = this;
+
+	if(firstMove)
+		hasMoved = false;
 }
 
 void Piece::scan(int x,int y,int range,deque<coord>& moves,Piece* spaces[8][8])

@@ -15,7 +15,6 @@
 #include "queen.h"
 #include "rook.h"
 #include <deque>
-
 using std::deque;
 
 #define WHITE 0
@@ -35,23 +34,24 @@ class Board {
 		// Member Functions
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM]);
 		void handleEvent(SDL_Event*);
+		bool noMoves();
         
 	private:
 		// Private Data Members
 		deque<Piece*> pieces; // Chess Board
 		deque<coord> possMoves;
-        Piece* spaces[8][8];
+		Piece* spaces[8][8];
 		Piece* chosen = NULL; // selected piece
 		Piece* enPass = NULL; //pawn that just moved two spaces
+		Piece* lastKill = NULL;
 		bool turn = WHITE;
-        bool check = false;
 
 		// Private Helper Functions
 		void addPiece(Piece*);
-		bool movePiece(Piece*,coord);
+		void movePiece(Piece*,coord,bool);
 		void removePiece(Piece*);
-		bool checkCheck(bool);
-		bool checkCheckMate(bool);
+		deque<coord> getPieceMoves(Piece*);
+		bool checkCheck();
 };
 
 Board::Board() {
@@ -123,15 +123,97 @@ void Board::addPiece(Piece* newPiece) {
 
 void Board::removePiece(Piece* capturedPiece) {
 
-  // Delete Instance of Piece
-  delete capturedPiece;
- 
+  coord pos = capturedPiece->getPosition();
+  spaces[pos.x][pos.y] = NULL;
+
+  // Hold piece
+  lastKill = capturedPiece;
+
+  //remove from deque
   for(int i = 0; i < pieces.size(); i++)
     if(pieces[i] == capturedPiece)
       pieces.erase(pieces.begin()+i);
 }
 
-bool Board::movePiece(Piece* piece, coord moveTo) {
+deque<coord> Board::getPieceMoves(Piece* piece) {
+
+  deque<coord> moves = piece->getPossMoves(spaces, enPass);
+  coord pos = piece->getPosition();
+
+  //look through possible moves
+  for( int i = 0; i < moves.size(); i++ ) {
+
+    bool castleRight = false, castleLeft = false;
+    if(piece->getType()==king)
+      if(moves[i].x-pos.x == 2 )
+        castleRight = true;
+      else if(moves[i].x-pos.x == -2 )
+        castleLeft = true;
+
+    //can't castle out of check
+    if(checkCheck() &&(castleRight || castleLeft)) {
+        moves.erase(moves.begin()+i);
+        i--;
+        continue;
+    }
+
+    //temporary move
+    movePiece( piece, moves[i], true );
+
+    if(checkCheck()) {
+      moves.erase(moves.begin()+i);
+      i--;
+    }
+
+    //reverse temp move
+    piece->revert(spaces);
+
+    //reverse castling
+    if(castleRight)
+      spaces[pos.x+1][pos.y]->revert(spaces);
+    else if(castleLeft)
+      spaces[pos.x-1][pos.y]->revert(spaces);
+
+    //reverse capture
+    if(lastKill)
+      addPiece(lastKill);
+    lastKill = NULL;
+  }
+
+  return moves;
+}
+
+bool Board::checkCheck() {
+
+  //check enemy moves
+  for( int j = 0; j < pieces.size(); j++ )
+    if( pieces[j]->getColor() != turn ) {
+      deque<coord> enemyMoves = pieces[j]->getPossMoves(spaces, enPass);
+
+      for( int k = 0; k < enemyMoves.size(); k++ ) {
+        Piece* target = spaces[enemyMoves[k].x][enemyMoves[k].y];
+
+        //enemy can attack king
+        if( target != NULL && target->getType() == king )
+          return true;
+      }
+    }
+
+  return false;
+
+}
+
+bool Board::noMoves() {
+
+    for(int i = 0; i < pieces.size(); i++)
+      if(pieces[i]->getColor()==turn)
+        if( getPieceMoves(pieces[i]).size() > 0 )
+          return false;
+
+  return true;
+}
+
+void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
       
   // Castling
   if(piece->getType()==king && !piece->getHasMoved()) {
@@ -140,12 +222,12 @@ bool Board::movePiece(Piece* piece, coord moveTo) {
 
     // Right
     if(moveTo.x == 6)
-      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos);
+      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos,false);
  
     rookPos.x++;
     // Left
     if(moveTo.x == 2)
-      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos);
+      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos,false);
   }
 
   // Check if captured piece
@@ -159,43 +241,27 @@ bool Board::movePiece(Piece* piece, coord moveTo) {
         enPass == spaces[moveTo.x][moveTo.y+1-enPass->getColor()*2])
       removePiece(enPass);
 
-    // Check for new en passant
-    if(moveTo.y - piece->getPosition().y == 2 ||
-        moveTo.y - piece->getPosition().y == -2)
-      enPass = piece;
-    else
-      enPass = NULL;
+    // Check for new en passant if real move
+    if(!hypo) {
+      if(moveTo.y - piece->getPosition().y == 2 ||
+          moveTo.y - piece->getPosition().y == -2)
+        enPass = piece;
+      else
+        enPass = NULL;
+    }
   }
 
   // Move piece
-  coord origPos = piece->getPosition();
-  spaces[origPos.x][origPos.y] = NULL;
-  piece->move(moveTo);
-  spaces[moveTo.x][moveTo.y] = piece;
+  piece->move(moveTo, spaces);
   
-  // Prevent move into check...
-  if (checkCheck(piece->getColor())) {
-    spaces[moveTo.x][moveTo.y] = NULL;
-    piece->move(origPos);
-    spaces[origPos.x][origPos.y] = piece;
-    return 0;
-  }
-
-  // Promote pawns
-  if(piece->getType() == pawn && moveTo.y%7 == 0) {
+  // Promote pawns if real move
+  if( !hypo && piece->getType() == pawn && moveTo.y%7 == 0) {
     bool c = piece->getColor();
     delete piece;
     piece = new Queen(moveTo, c);
   }
-
-  return 1;
 }
-
 void Board::handleEvent(SDL_Event* e) {
-
-  // Mouse Click  
-  if(e->type != SDL_MOUSEBUTTONDOWN)
-    return;
 
   // Mouse Location
   coord click;
@@ -220,23 +286,31 @@ void Board::handleEvent(SDL_Event* e) {
   // Look through possible moves
   bool move = false;
   for(int i = 0; i < possMoves.size(); i++)
-    if(possMoves[i].x == click.x && possMoves[i].y == click.y)
+    if(possMoves[i] == click)
       move = true;
 
   possMoves.clear();
-  
-  if(move) {
  
-    // If Move Was Successful, Change Turn
-    if(movePiece(chosen,click))
-        turn = !turn;
+  if(move) {
+
+    //permanent move
+    movePiece(chosen, click, false);
+
+    //ignore last kill
+    if(lastKill != NULL)
+      delete lastKill;
+
+    lastKill = NULL;
+
+    // Change Turn
+    turn = !turn;
     
     // Deselect
     chosen = NULL;
 
     return;
   }
-    
+ 
   // Clicked empty or opponent space
   if(spaces[click.x][click.y] == NULL)
     chosen = NULL;
@@ -245,7 +319,7 @@ void Board::handleEvent(SDL_Event* e) {
     chosen = NULL;
   else {                                          // Selected new piece
     chosen = spaces[click.x][click.y];
-    possMoves = chosen->getPossMoves(spaces, enPass);
+    possMoves = getPieceMoves(chosen);
   }
 }
 
@@ -279,46 +353,15 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
   // Display pieces
   for(int i = 0; i < pieces.size(); i++)
     pieces[i]->display( gRenderer, texture, clips, SIDE );
-
+ 
+  if(noMoves()) {
+    if(checkCheck())
+      texture.render(gRenderer, SIDE/8*4,
+                   SIDE/8*7-SIDE/8*4, &clips[15+!turn]); 
+    else
+      texture.render(gRenderer, SIDE/8*4,
+                   SIDE/8*7-SIDE/8*4, &clips[14]); 
+  }
 }
-
-bool Board::checkCheck(bool color) {
-  
-    // Find location of king
-    int i, j;
-    coord LocK;
-    
-    for (i = 0; i < pieces.size(); i++) {
-        if (pieces[i]->getType() == king && pieces[i]->getColor() == color) {
-            LocK = pieces[i]->getPosition();
-        }
-    }
-  
-    // See if this matches any possible moves from other team
-    deque<coord> tempPossMoves;
-    for (i = 0; i < pieces.size(); i++) {
-        if (pieces[i]->getColor() != color) {
-            for (j = 0; j < pieces[i]->getPossMoves(spaces, enPass).size(); j++) {
-	            if (pieces[i]->getPossMoves(spaces, enPass)[j] == LocK)
-	                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-/*
-bool Board::checkCheckmate(bool color) {
-        if(checkCheck(color)) {
-                for(int i = 0; i < pieces.size(); i++) {
-                        if(pieces[i]->getColor() != color) {
-                                for(int j = 0; j < pieces[i]->getPossMoves(spaces, enPass).size(); j++) {
-                                        if(move)
-                                }        
-                        }
-                }
-        }
-}*/
 
 #endif
