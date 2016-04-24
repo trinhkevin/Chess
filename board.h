@@ -222,12 +222,12 @@ void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
 
     // Right
     if(moveTo.x == 6)
-      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos,false);
+      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos,true);
  
     rookPos.x++;
     // Left
     if(moveTo.x == 2)
-      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos,false);
+      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos,true);
   }
 
   // Check if captured piece
@@ -259,6 +259,19 @@ void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
     bool c = piece->getColor();
     delete piece;
     piece = new Queen(moveTo, c);
+  }
+
+  if(!hypo) {
+    //forget last kill
+    if(lastKill != NULL)
+      delete lastKill;
+    lastKill = NULL;
+
+    // Change Turn
+    turn = !turn;
+    
+    // Deselect
+    chosen = NULL;
   }
 }
 void Board::handleEvent(SDL_Event* e) {
@@ -295,18 +308,6 @@ void Board::handleEvent(SDL_Event* e) {
 
     //permanent move
     movePiece(chosen, click, false);
-
-    //ignore last kill
-    if(lastKill != NULL)
-      delete lastKill;
-
-    lastKill = NULL;
-
-    // Change Turn
-    turn = !turn;
-    
-    // Deselect
-    chosen = NULL;
 
     return;
   }

@@ -25,10 +25,19 @@ void AI::tryMove(Board& board)
   if(board.turn != color)
     return;
 
-  printf("turn\n");
+  deque<coord> moves;
 
-  board.turn = !board.turn;
+  int i = 0;
+
+  // skip opponent pieces or pieces that can't move
+  while(board.pieces[i]->getColor() != color ||
+        !board.getPieceMoves(board.pieces[i]).size())
+    i++;
+
+  // make first possible move
+  board.movePiece(board.pieces[i],
+                  board.getPieceMoves(board.pieces[i])[0], false);
+   
 }
-
 
 #endif
