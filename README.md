@@ -31,3 +31,17 @@ This game will include:
 * Graphics Utilizing SDL2 (done)
 
 *This is currently a WIP.*
+
+Documentation
+--------
+
+*Libraries:*
+You will need **lib-sdl2**, **lib-sdl2-dev**, and **lib-sdl2-image**.
+
+*How to Install:*
+Download the git repository and type "make" in your terminal (you must have the above libraries).
+
+*User Manual:*
+After compiling the program, execute the *chess* file created. You will
+
+*Known bugs:*
