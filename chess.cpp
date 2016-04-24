@@ -7,6 +7,8 @@
 #include <cmath>
 #include "LTexture.h"
 #include "board.h"
+#include "AI.h"
+#include <iostream>
 
 //Starts up SDL and creates window
 bool init();
@@ -16,6 +18,9 @@ bool loadMedia();
 
 //Frees media and shuts down SDL
 void close();
+
+//display game
+void disp(Board&);
 
 //Loads individual image as texture
 SDL_Texture* loadTexture( std::string path );
@@ -152,8 +157,46 @@ SDL_Texture* loadTexture( std::string path )
   return newTexture;
 }
 
+void disp( Board& board )
+{
+  //Clear screen
+  SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+  SDL_RenderClear( gRenderer );
+
+  board.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
+
+  //Update screen  
+  SDL_RenderPresent( gRenderer );
+
+}
+
 int main( int argc, char* args[] )
 {
+  AI* cpu = NULL;
+  char c;
+  printf("Play against human or CPU (h/c)? ");
+  std::cin >> c;
+
+  while( c != 'h' && c != 'c' )
+  {
+    printf("Enter 'h' to play against human or 'c' to play against CPU: ");
+    std::cin >> c;
+  }
+
+  if( c == 'c' )
+  {
+    printf("Do you want white or black (w/b)? ");
+    std::cin >> c;
+
+    while( c != 'w' && c != 'b' )
+    {
+      printf("Enter 'w' to play as white or 'b' to play as black: ");
+      std::cin >> c;
+    }
+    
+    cpu = new AI(c);
+  }
+
   //Start up SDL and create window
   if( !init() )
   {
@@ -175,15 +218,11 @@ int main( int argc, char* args[] )
       SDL_Event e;
 
       Board chessBoard;
+      
+      if(cpu)   //check if cpu can move
+        cpu->tryMove(chessBoard);
 
-      //Clear screen
-      SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-      SDL_RenderClear( gRenderer );
-
-      chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
-
-      //Update screen
-      SDL_RenderPresent( gRenderer );
+      disp( chessBoard );
 
       bool gameOver = false;
 
@@ -199,19 +238,18 @@ int main( int argc, char* args[] )
           // Mouse Click  
           if(!gameOver && e.type == SDL_MOUSEBUTTONDOWN) {
        
+            //handle user input
             chessBoard.handleEvent( &e );
 
 	    if( chessBoard.noMoves() )
 	      gameOver = true;
+            else if(cpu)   //check if cpu can move
+              cpu->tryMove(chessBoard);
 
-            //Clear screen
-            SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-            SDL_RenderClear( gRenderer );
-        
-            chessBoard.display(gRenderer, gSpriteSheetTexture, gSpriteClips );
+	    if( chessBoard.noMoves() )
+	      gameOver = true;
 
-            //Update screen
-            SDL_RenderPresent( gRenderer );
+            disp( chessBoard );
           }
         }
       }
