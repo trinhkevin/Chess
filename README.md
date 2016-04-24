@@ -35,13 +35,13 @@ This game will include:
 Documentation
 --------
 
-*Libraries:*
+**Libraries:**
 You will need **lib-sdl2**, **lib-sdl2-dev**, and **lib-sdl2-image**.
 
-*How to Install:*
+**How to Install:**
 Download the git repository and type "make" in your terminal (you must have the above libraries).
 
-*User Manual:*
+**User Manual:**
 After compiling the program, execute the *chess* file created. You will
 
-*Known bugs:*
+**Known bugs:**
