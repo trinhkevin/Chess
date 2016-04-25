@@ -43,7 +43,7 @@ class Board {
 		Piece* spaces[8][8];
 		Piece* chosen = NULL; // selected piece
 		Piece* enPass = NULL; //pawn that just moved two spaces
-		Piece* lastKill = NULL;
+		Piece* hold = NULL;
 		bool turn = WHITE;
 
 		// Private Helper Functions
@@ -126,9 +126,6 @@ void Board::removePiece(Piece* capturedPiece) {
   coord pos = capturedPiece->getPosition();
   spaces[pos.x][pos.y] = NULL;
 
-  // Hold piece
-  lastKill = capturedPiece;
-
   //remove from deque
   for(int i = 0; i < pieces.size(); i++)
     if(pieces[i] == capturedPiece)
@@ -143,19 +140,14 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
   //look through possible moves
   for( int i = 0; i < moves.size(); i++ ) {
 
-    bool castleRight = false, castleLeft = false;
-    if(piece->getType()==king)
-      if(moves[i].x-pos.x == 2 )
-        castleRight = true;
-      else if(moves[i].x-pos.x == -2 )
-        castleLeft = true;
+    if(piece->getType()==king && checkCheck())
+      if(moves[i].x-pos.x == 2 || moves[i].x-pos.x == -2 ) {
 
-    //can't castle out of check
-    if(checkCheck() &&(castleRight || castleLeft)) {
+        //can't castle out of check
         moves.erase(moves.begin()+i);
         i--;
         continue;
-    }
+      }
 
     //temporary move
     movePiece( piece, moves[i], true );
@@ -168,16 +160,10 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
     //reverse temp move
     piece->revert(spaces);
 
-    //reverse castling
-    if(castleRight)
-      spaces[pos.x+1][pos.y]->revert(spaces);
-    else if(castleLeft)
-      spaces[pos.x-1][pos.y]->revert(spaces);
-
     //reverse capture
-    if(lastKill)
-      addPiece(lastKill);
-    lastKill = NULL;
+    if(hold)
+      addPiece(hold);
+    hold = NULL;
   }
 
   return moves;
@@ -230,25 +216,29 @@ void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
       movePiece(spaces[moveTo.x -2][moveTo.y],rookPos,true);
   }
 
+  hold = NULL;
   // Check if captured piece
-  if(spaces[moveTo.x][moveTo.y] != NULL)
+  if(spaces[moveTo.x][moveTo.y] != NULL) {
+
+    hold = spaces[moveTo.x][moveTo.y];
     removePiece(spaces[moveTo.x][moveTo.y]);
+  }
 
-  if(piece->getType() == pawn) {
+  // Check if Attacking en passant
+  if(piece->getType() == pawn && enPass &&
+     enPass == spaces[moveTo.x][moveTo.y+1-enPass->getColor()*2]) {
+    hold = enPass;
+    removePiece(enPass);
+  }
 
-    // Check if Attacking en passant
-    if(enPass != NULL && 
-        enPass == spaces[moveTo.x][moveTo.y+1-enPass->getColor()*2])
-      removePiece(enPass);
+  // Check for new en passant if real move
+  if(!hypo) {
+    enPass = NULL;
 
-    // Check for new en passant if real move
-    if(!hypo) {
+    if(piece->getType() == pawn)
       if(moveTo.y - piece->getPosition().y == 2 ||
           moveTo.y - piece->getPosition().y == -2)
         enPass = piece;
-      else
-        enPass = NULL;
-    }
   }
 
   // Move piece
@@ -262,10 +252,10 @@ void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
   }
 
   if(!hypo) {
-    //forget last kill
-    if(lastKill != NULL)
-      delete lastKill;
-    lastKill = NULL;
+
+    if(hold)
+      delete hold;
+    hold = NULL;
 
     // Change Turn
     turn = !turn;

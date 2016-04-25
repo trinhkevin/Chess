@@ -157,7 +157,7 @@ SDL_Texture* loadTexture( std::string path )
   return newTexture;
 }
 
-void disp( Board& board )
+void display( Board& board )
 {
   //Clear screen
   SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -173,6 +173,7 @@ void disp( Board& board )
 int main( int argc, char* args[] )
 {
   AI* cpu = NULL;
+  Board chessBoard;
   char c;
   printf("Play against human or CPU (h/c)? ");
   std::cin >> c;
@@ -194,7 +195,7 @@ int main( int argc, char* args[] )
       std::cin >> c;
     }
     
-    cpu = new AI(c);
+    cpu = new AI(c, &chessBoard);
   }
 
   //Start up SDL and create window
@@ -216,13 +217,11 @@ int main( int argc, char* args[] )
       
       //Event handler
       SDL_Event e;
-
-      Board chessBoard;
       
       if(cpu)   //check if cpu can move
-        cpu->tryMove(chessBoard);
+        cpu->tryMove(0);
 
-      disp( chessBoard );
+      display( chessBoard );
 
       bool gameOver = false;
 
@@ -243,13 +242,14 @@ int main( int argc, char* args[] )
 
 	    if( chessBoard.noMoves() )
 	      gameOver = true;
-            else if(cpu)   //check if cpu can move
-              cpu->tryMove(chessBoard);
+            else if(cpu) {   //check if cpu can move
+              display( chessBoard );
+              cpu->tryMove(0);
+	      if( chessBoard.noMoves() )
+	        gameOver = true;
+            }
 
-	    if( chessBoard.noMoves() )
-	      gameOver = true;
-
-            disp( chessBoard );
+            display( chessBoard );
           }
         }
       }

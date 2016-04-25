@@ -67,6 +67,13 @@ void Piece::move(coord nPosition, Piece* spaces[8][8]) {
 
 void Piece::revert(Piece* spaces[8][8]) {
 
+	if(type==king) {
+          if(lastPosition.x-position.x == 2)
+	    spaces[position.x+1][position.y]->revert(spaces);
+          if(lastPosition.x-position.x == -2)
+	    spaces[position.x-1][position.y]->revert(spaces);
+	}
+          
 	spaces[position.x][position.y] = NULL;
 	position = lastPosition;
 	spaces[position.x][position.y] = this;
