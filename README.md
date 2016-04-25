@@ -31,3 +31,17 @@ This game will include:
 * Graphics Utilizing SDL2 (done)
 
 *This is currently a WIP.*
+
+Documentation
+--------
+
+**Libraries:**
+You will need **lib-sdl2**, **lib-sdl2-dev**, and **lib-sdl2-image**.
+
+**How to Install:**
+Download the git repository and type "make" in your terminal (you must have the above libraries).
+
+**User Manual:**
+After compiling the program, execute the *chess* file created. You will be prompted to input options for your game. After entering the options, an SDL2 window will appear. Simply click on the piece you want to move once it's your turn and click on one of the highlighted tiles that appear (indicating that you are able to move there). To exit the game, click on the terminal window and type Ctrl-C.
+
+**Known bugs:**
