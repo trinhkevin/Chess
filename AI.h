@@ -7,12 +7,14 @@ class AI {
 
   public:
     AI(char, Board*);
+		//recursive look
     void lookAhead(int,Piece*,coord*,Piece**,coord*,int*,bool);
     Piece* tryMove(int,bool);
+		//return value of current board state
     int score();
   private:
-    bool color = BLACK;
-    Board* board;
+    bool color = BLACK;  //team color
+    Board* board;        //bound chessboard
 };
 
 AI::AI(char opponentColor, Board* chessBoard) {
@@ -29,9 +31,10 @@ Piece* AI::tryMove(int turns, bool hypo)
   if(board->turn != color)
     return NULL;
 
+  //track favorite piece/move
   Piece* bestPiece = NULL;
   coord bestMove;
-  int bestScore;
+  int bestScore = -11000;
 	
   lookAhead(turns, NULL, NULL, &bestPiece,&bestMove,&bestScore, true);
 
@@ -44,29 +47,32 @@ Piece* AI::tryMove(int turns, bool hypo)
 void AI::lookAhead(int turns, Piece* candidateP, coord* candidateM, 
                    Piece** bestP, coord* bestM, int* bestS, bool first) {
 
+	//look through spaces
   for(int i = 0; i < 64; i++) {
 
     Piece* piece = board->spaces[i%8][i/8];
-		if(first)
-			candidateP = piece;
 
+		//find own pieces
     if(piece && piece->getColor() == color) {
+		
+			//track root piece
+			if(first)
+				candidateP = piece;
 
+			//check through moves
       deque<coord> moves = board->getPieceMoves(piece);
       for(int j = 0; j < moves.size(); j++) {
+				//track root move
 				if(first)
 					candidateM = &moves[j];
 
+				//temporary move
 				Piece* enPass = board->enPass;
         board->movePiece(piece,moves[j],true);
         Piece* hold = board->hold;
 
-				if(!*bestP) {
-          *bestS = -10000;
-          *bestP = candidateP;
-          *bestM = *candidateM;
-				}
-        else if (turns == 0 && score() > *bestS)  {
+				//check score if end of recursion
+        if (turns == 0 && score() > *bestS)  {
           *bestS = score();
           *bestP = candidateP;
           *bestM = *candidateM;
@@ -74,8 +80,11 @@ void AI::lookAhead(int turns, Piece* candidateP, coord* candidateM,
 				//endgame
 				if(board->noMoves(!board->turn)) {
 					//checkmate
-					if(board->checkCheck(!board->turn)){
-          	*bestS = 10000;
+					if(board->checkCheck(!board->turn) && 10000 > *bestS){
+          	*bestS = 9000;
+						//quick checkmate most valuable
+						if(first)
+          		*bestS = 10000;
           	*bestP = candidateP;
           	*bestM = *candidateM;
 					}
@@ -95,15 +104,24 @@ void AI::lookAhead(int turns, Piece* candidateP, coord* candidateM,
 					Piece* oppHold = board->hold;
           color = !color;
           board->turn = !board->turn;
-          
-          lookAhead(turns-1,candidateP,candidateM,bestP,bestM,bestS,false);
 
+					// pick dead end move only if no options
+					if(board->noMoves(color) && -10000 > *bestS) {
+          	*bestS = -10000;
+          	*bestP = candidateP;
+          	*bestM = *candidateM;
+					}					
+					else
+          	lookAhead(turns-1,candidateP,candidateM,bestP,bestM,bestS,false);
+
+					//revert opponent move
 					oppPiece->revert(board->spaces);
 					board->enPass = oppEnPass;
 					if(oppHold)
 						board->addPiece(oppHold);
         }
 
+				//revert own move
         piece->revert(board->spaces);
 
 				board->enPass = enPass;
@@ -120,11 +138,13 @@ int AI::score()
 {
   int points = 0;
 
-	if(board->checkCheck(!board->turn))
+	// putting opponent in check is good
+	if(board->checkCheck(!color))
 		points += 50;
 
   for(int i = 0; i < board->pieces.size(); i++) {
     int value;
+		//piece values
     switch(board->pieces[i]->getType()) {
       case pawn:   value = 100; break;
       case bishop: value = 300; break;
@@ -135,6 +155,7 @@ int AI::score()
     }
     if(board->pieces[i]->getColor() == color) {
       points += value;
+			// prefer forward positioning
 			if(color==WHITE)
 				points += board->pieces[i]->getPosition().y;
 			else
