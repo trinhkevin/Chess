@@ -32,54 +32,87 @@ class Piece {
 	public:
 		Piece(pieceType, coord, bool nColor );
 		coord getPosition()	{ return position; }
-		void move(coord, Piece* [8][8]);
+		void move(coord, Piece* [8][8], bool);
 		void revert(Piece*[8][8]);
 		pieceType getType()const{ return type; }
-		bool getHasMoved()const { return hasMoved; }
+		bool getHasMoved()const { return hasMoved.back(); }
 		bool getColor()const	{ return color; }
 		virtual deque<coord> getPossMoves( Piece*[8][8],Piece*) = 0;
 		void scan(int,int,int,deque<coord>&, Piece*[8][8] );
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM], int);
 	private:
 		coord position;
-		coord lastPosition;
 		pieceType type;
 		bool color;
-		bool hasMoved = false;
-		bool firstMove = true;
+		deque<coord> moves;
+    deque<bool> promote;
+		deque<bool> hasMoved;
 };
 
 Piece::Piece(pieceType nType, coord nPosition, bool nColor)
-      : position(nPosition), type(nType), color(nColor) {}
+      : position(nPosition), type(nType), color(nColor) {
 
-void Piece::move(coord nPosition, Piece* spaces[8][8]) {
+	hasMoved.push_back(false);
+}
 
-	lastPosition = position;
-	spaces[position.x][position.y] = NULL;
-	position = nPosition;
-	spaces[position.x][position.y] = this;
+void Piece::move(coord moveTo, Piece* spaces[8][8], bool track) {
 
-	if(hasMoved)
-		firstMove = false;
+  if(track)
+    moves.push_back(position);
 
-	hasMoved = true;
+  // Castling
+  if(type==king && !hasMoved.back()) {
+    coord rookPos = moveTo;
+    rookPos.x--;
+
+    // Right
+    if(moveTo.x == 6)
+      spaces[moveTo.x+1][moveTo.y]->move(rookPos,spaces,track);
+
+    rookPos.x+=2;
+    // Left
+    if(moveTo.x == 2)
+      spaces[moveTo.x -2][moveTo.y]->move(rookPos,spaces,track);
+  } 
+
+  spaces[position.x][position.y] = NULL;
+  position = moveTo;
+  spaces[position.x][position.y] = this;
+
+  if(type == pawn && position.y%7 == 0) {
+    type = queen;
+    if(track)
+			promote.push_back(true);
+  }
+	else if(track)
+		promote.push_back(false);
+
+	if(track)
+		hasMoved.push_back(true);
+	else {
+		hasMoved.clear();
+		hasMoved.push_back(true);
+	}
+
 }
 
 void Piece::revert(Piece* spaces[8][8]) {
 
 	if(type==king) {
-          if(lastPosition.x-position.x == 2)
+    if(moves.back().x-position.x == 2)
 	    spaces[position.x+1][position.y]->revert(spaces);
-          if(lastPosition.x-position.x == -2)
+    if(moves.back().x-position.x == -2)
 	    spaces[position.x-1][position.y]->revert(spaces);
 	}
           
 	spaces[position.x][position.y] = NULL;
-	position = lastPosition;
+	position = moves.back();
+	if(promote.back())
+		type = pawn;
+  promote.pop_back();
+	moves.pop_back();
+  hasMoved.pop_back();
 	spaces[position.x][position.y] = this;
-
-	if(firstMove)
-		hasMoved = false;
 }
 
 void Piece::scan(int x,int y,int range,deque<coord>& moves,Piece* spaces[8][8])

@@ -22,6 +22,20 @@ deque<coord> Pawn::getPossMoves( Piece* spaces[8][8], Piece* enPass ){
 
 	// Initialize Variables
 	deque<coord> moves;
+
+  if(getType()==queen) {
+	  scan( -1,  0, 7, moves, spaces );
+		scan( -1,  1, 7, moves, spaces );
+	  scan(  0,  1, 7, moves, spaces );
+	  scan(  1,  1, 7, moves, spaces );
+		scan(  1,  0, 7, moves, spaces );
+		scan(  1, -1, 7, moves, spaces );
+	  scan(  0, -1, 7, moves, spaces );
+  	scan( -1, -1, 7, moves, spaces );
+
+  	return moves;
+  }
+
 	coord ncoord;
 	int x = getPosition().x;
 	int y = getPosition().y;

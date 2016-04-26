@@ -173,6 +173,7 @@ void display( Board& board )
 int main( int argc, char* args[] )
 {
   AI* cpu = NULL;
+  int diff;
   Board chessBoard;
   char c;
   printf("Play against human or CPU (h/c)? ");
@@ -186,6 +187,15 @@ int main( int argc, char* args[] )
 
   if( c == 'c' )
   {
+    printf("Easy, Mid, or Hard CPU (0/1/2)? ");
+    std::cin >> diff;
+
+    while( diff != 0 && diff != 1 && diff != 2 )
+    {
+      printf("Enter 0 for easy, 1 for Mid, 2 for Hard CPU: ");
+      std::cin >> diff;
+    }
+
     printf("Do you want white or black (w/b)? ");
     std::cin >> c;
 
@@ -219,7 +229,7 @@ int main( int argc, char* args[] )
       SDL_Event e;
       
       if(cpu)   //check if cpu can move
-        cpu->tryMove(0);
+        cpu->tryMove(diff,false);
 
       display( chessBoard );
 
@@ -240,13 +250,13 @@ int main( int argc, char* args[] )
             //handle user input
             chessBoard.handleEvent( &e );
 
-	    if( chessBoard.noMoves() )
-	      gameOver = true;
+      	    if( chessBoard.noMoves(chessBoard.getTurn()) )
+	            gameOver = true;
             else if(cpu) {   //check if cpu can move
               display( chessBoard );
-              cpu->tryMove(0);
-	      if( chessBoard.noMoves() )
-	        gameOver = true;
+              cpu->tryMove(diff,false);
+	          if( chessBoard.noMoves(chessBoard.getTurn()) )
+	            gameOver = true;
             }
 
             display( chessBoard );

@@ -34,7 +34,8 @@ class Board {
 		// Member Functions
 		void display(SDL_Renderer*, LTexture&, SDL_Rect[CLIPNUM]);
 		void handleEvent(SDL_Event*);
-		bool noMoves();
+		bool noMoves(bool);
+		bool getTurn() const { return turn; }
         
 	private:
 		// Private Data Members
@@ -51,7 +52,7 @@ class Board {
 		void movePiece(Piece*,coord,bool);
 		void removePiece(Piece*);
 		deque<coord> getPieceMoves(Piece*);
-		bool checkCheck();
+		bool checkCheck(bool);
 };
 
 Board::Board() {
@@ -104,6 +105,7 @@ Board::Board() {
     pos.y = 6;
     addPiece(new Pawn(pos,BLACK ));
   }
+
 }
 
 Board::~Board() {
@@ -140,19 +142,18 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
   //look through possible moves
   for( int i = 0; i < moves.size(); i++ ) {
 
-    if(piece->getType()==king && checkCheck())
-      if(moves[i].x-pos.x == 2 || moves[i].x-pos.x == -2 ) {
-
-        //can't castle out of check
-        moves.erase(moves.begin()+i);
-        i--;
-        continue;
-      }
+		//cant' castle out of check
+    if(checkCheck(turn) && piece->getType()==king &&
+			(moves[i].x-pos.x == 2|| moves[i].x-pos.x == -2)) {
+      moves.erase(moves.begin()+i);
+      i--;
+    }
+    Piece* lastEnPass = enPass;
 
     //temporary move
     movePiece( piece, moves[i], true );
 
-    if(checkCheck()) {
+    if(checkCheck(piece->getColor())) {
       moves.erase(moves.begin()+i);
       i--;
     }
@@ -160,6 +161,7 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
     //reverse temp move
     piece->revert(spaces);
 
+		enPass = lastEnPass;
     //reverse capture
     if(hold)
       addPiece(hold);
@@ -169,11 +171,11 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
   return moves;
 }
 
-bool Board::checkCheck() {
+bool Board::checkCheck(bool side) {
 
   //check enemy moves
   for( int j = 0; j < pieces.size(); j++ )
-    if( pieces[j]->getColor() != turn ) {
+    if( pieces[j]->getColor() != side ) {
       deque<coord> enemyMoves = pieces[j]->getPossMoves(spaces, enPass);
 
       for( int k = 0; k < enemyMoves.size(); k++ ) {
@@ -189,33 +191,18 @@ bool Board::checkCheck() {
 
 }
 
-bool Board::noMoves() {
+bool Board::noMoves(bool side) {
 
     for(int i = 0; i < pieces.size(); i++)
-      if(pieces[i]->getColor()==turn)
+      if(pieces[i]->getColor()==side)
         if( getPieceMoves(pieces[i]).size() > 0 )
           return false;
 
   return true;
 }
 
-void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
+void Board::movePiece(Piece* piece, coord moveTo, bool track) {
       
-  // Castling
-  if(piece->getType()==king && !piece->getHasMoved()) {
-    coord rookPos = moveTo;
-    rookPos.x--;
-
-    // Right
-    if(moveTo.x == 6)
-      movePiece(spaces[moveTo.x+1][moveTo.y],rookPos,true);
- 
-    rookPos.x++;
-    // Left
-    if(moveTo.x == 2)
-      movePiece(spaces[moveTo.x -2][moveTo.y],rookPos,true);
-  }
-
   hold = NULL;
   // Check if captured piece
   if(spaces[moveTo.x][moveTo.y] != NULL) {
@@ -231,27 +218,18 @@ void Board::movePiece(Piece* piece, coord moveTo, bool hypo) {
     removePiece(enPass);
   }
 
-  // Check for new en passant if real move
-  if(!hypo) {
-    enPass = NULL;
+  // Check for new en passant
+  enPass = NULL;
 
-    if(piece->getType() == pawn)
-      if(moveTo.y - piece->getPosition().y == 2 ||
-          moveTo.y - piece->getPosition().y == -2)
-        enPass = piece;
-  }
+  if(piece->getType() == pawn)
+    if(moveTo.y - piece->getPosition().y == 2 ||
+        moveTo.y - piece->getPosition().y == -2)
+      enPass = piece;
 
   // Move piece
-  piece->move(moveTo, spaces);
+  piece->move(moveTo, spaces, track);
   
-  // Promote pawns if real move
-  if( !hypo && piece->getType() == pawn && moveTo.y%7 == 0) {
-    bool c = piece->getColor();
-    delete piece;
-    piece = new Queen(moveTo, c);
-  }
-
-  if(!hypo) {
+  if(!track) {
 
     if(hold)
       delete hold;
@@ -345,8 +323,8 @@ void Board::display(SDL_Renderer* gRenderer, LTexture &texture, SDL_Rect clips[C
   for(int i = 0; i < pieces.size(); i++)
     pieces[i]->display( gRenderer, texture, clips, SIDE );
  
-  if(noMoves()) {
-    if(checkCheck())
+  if(noMoves(turn)) {
+    if(checkCheck(turn))
       texture.render(gRenderer, SIDE/8*4,
                    SIDE/8*7-SIDE/8*4, &clips[15+!turn]); 
     else

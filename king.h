@@ -30,7 +30,9 @@ deque<coord> King::getPossMoves( Piece* spaces[8][8], Piece* enPass) {
 	for(int i = 0; i < 9; i++)
 	  scan( i%3 - 1, i/3 - 1, 1, moves, spaces );
 
-        //castling
+  bool check = false;
+
+  //castling
 	if( !getHasMoved() ) {
           //right side
           ncoord.x = x+2;

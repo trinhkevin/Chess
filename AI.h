@@ -7,15 +7,12 @@ class AI {
 
   public:
     AI(char, Board*);
-    int lookAhead(int);
-    void tryMove(int);
+    void lookAhead(int,Piece*,coord*,Piece**,coord*,int*,bool);
+    Piece* tryMove(int,bool);
     int score();
   private:
     bool color = BLACK;
     Board* board;
-    Piece* bestPiece;
-    coord bestMove;
-    int bestScore;
 };
 
 AI::AI(char opponentColor, Board* chessBoard) {
@@ -26,52 +23,90 @@ AI::AI(char opponentColor, Board* chessBoard) {
   board = chessBoard;
 }
 
-void AI::tryMove(int turns)
+Piece* AI::tryMove(int turns, bool hypo)
 {
   //not cpu turn
   if(board->turn != color)
-    return;
+    return NULL;
 
-  bestScore = -500;
-  lookAhead(turns);
+  Piece* bestPiece = NULL;
+  coord bestMove;
+  int bestScore;
+	
+  lookAhead(turns, NULL, NULL, &bestPiece,&bestMove,&bestScore, true);
 
   // make best move
-  board->movePiece(bestPiece,bestMove,false);
-  
+  board->movePiece(bestPiece,bestMove,hypo);
+
+  return bestPiece;   
 }
 
-int AI::lookAhead(int turns) {
+void AI::lookAhead(int turns, Piece* candidateP, coord* candidateM, 
+                   Piece** bestP, coord* bestM, int* bestS, bool first) {
 
   for(int i = 0; i < 64; i++) {
 
     Piece* piece = board->spaces[i%8][i/8];
+		if(first)
+			candidateP = piece;
 
     if(piece && piece->getColor() == color) {
 
       deque<coord> moves = board->getPieceMoves(piece);
       for(int j = 0; j < moves.size(); j++) {
+				if(first)
+					candidateM = &moves[j];
+
+				Piece* enPass = board->enPass;
         board->movePiece(piece,moves[j],true);
         Piece* hold = board->hold;
 
-        if(turns == 0 && score() > bestScore) {
-          bestScore = score();
-          bestPiece = piece;
-          bestMove = moves[j];
+				if(!*bestP) {
+          *bestS = -10000;
+          *bestP = candidateP;
+          *bestM = *candidateM;
+				}
+        else if (turns == 0 && score() > *bestS)  {
+          *bestS = score();
+          *bestP = candidateP;
+          *bestM = *candidateM;
         }
-        else if(turns > 0) {
+				//endgame
+				if(board->noMoves(!board->turn)) {
+					//checkmate
+					if(board->checkCheck(!board->turn)){
+          	*bestS = 10000;
+          	*bestP = candidateP;
+          	*bestM = *candidateM;
+					}
+					else if( -1 > *bestS ) {   //draw
+          	*bestS = -1;
+          	*bestP = candidateP;
+          	*bestM = *candidateM;
+					}
+        }
+				else if(turns > 0) {
 
           // predict opponent move
           board->turn = !board->turn;
           color = !color;
-          tryMove(turns-1);
+					Piece* oppEnPass = board->enPass;
+          Piece* oppPiece = tryMove(turns-1,true);
+					Piece* oppHold = board->hold;
           color = !color;
           board->turn = !board->turn;
           
-          lookAhead(turns-1);
+          lookAhead(turns-1,candidateP,candidateM,bestP,bestM,bestS,false);
+
+					oppPiece->revert(board->spaces);
+					board->enPass = oppEnPass;
+					if(oppHold)
+						board->addPiece(oppHold);
         }
 
         piece->revert(board->spaces);
 
+				board->enPass = enPass;
         if(hold)
           board->addPiece(hold);
         hold = NULL;
@@ -83,36 +118,28 @@ int AI::lookAhead(int turns) {
 
 int AI::score()
 {
-  board->turn = !board->turn;
-
-  if(board->noMoves()) {
-    //checkmate
-    if( board->checkCheck()) {
-      board->turn = !board->turn;
-      return 100;
-    }
-
-    //avoid draw
-    board->turn = !board->turn;
-    return -100;
-  }
-  board->turn = !board->turn;
-
-
   int points = 0;
+
+	if(board->checkCheck(!board->turn))
+		points += 50;
 
   for(int i = 0; i < board->pieces.size(); i++) {
     int value;
     switch(board->pieces[i]->getType()) {
-      case pawn:   value = 1; break;
-      case bishop: value = 3; break;
-      case knight: value = 3; break;
-      case rook:   value = 5; break;
-      case queen:  value = 9; break;
+      case pawn:   value = 100; break;
+      case bishop: value = 300; break;
+      case knight: value = 300; break;
+      case rook:   value = 500; break;
+      case queen:  value = 900; break;
       case king:   value = 0; break;
     }
-    if(board->pieces[i]->getColor() == color) 
+    if(board->pieces[i]->getColor() == color) {
       points += value;
+			if(color==WHITE)
+				points += board->pieces[i]->getPosition().y;
+			else
+				points += 7-board->pieces[i]->getPosition().y;
+		}
     else
       points -= value;
   }
