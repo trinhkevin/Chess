@@ -23,7 +23,7 @@ deque<coord> Knight::getPossMoves( Piece* spaces[8][8], Piece* enPass) {
 	// Initialize Variables
         deque<coord> moves;
 
-    // Return Moves
+	// Return Moves
 	scan( -2,  1, 1, moves, spaces );
 	scan( -1,  2, 1, moves, spaces );
 	scan(  1,  2, 1, moves, spaces );

@@ -19,7 +19,8 @@ Pawn::Pawn(coord nPosition, bool nColor )
 }
 
 deque<coord> Pawn::getPossMoves( Piece* spaces[8][8], Piece* enPass ){
-
+        //deque will contain all locations that the pawn can move to
+  
 	// Initialize Variables
 	deque<coord> moves;
 

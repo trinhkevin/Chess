@@ -12,11 +12,14 @@ using std::deque;
 const int CLIPNUM = 17;
 enum pieceType{ king, queen, bishop, knight, rook, pawn };
 
+
+//coord struct used to contain board coordinates
 struct coord
 {
   int x;
   int y;
-
+  
+  //overwritten comparison operator
   inline bool operator==(coord a) {
     if (a.x==x && a.y== y)
       return true;
@@ -56,7 +59,7 @@ Piece::Piece(pieceType nType, coord nPosition, bool nColor)
 }
 
 void Piece::move(coord moveTo, Piece* spaces[8][8], bool track) {
-
+  //manages the movement of a piece
   if(track)
     moves.push_back(position);
 
@@ -80,43 +83,44 @@ void Piece::move(coord moveTo, Piece* spaces[8][8], bool track) {
   spaces[position.x][position.y] = this;
 
   if(type == pawn && position.y%7 == 0) {
-    type = queen;
+    type = queen; //automatic promotion to queen
     if(track)
-			promote.push_back(true);
+      promote.push_back(true);
   }
-	else if(track)
-		promote.push_back(false);
-
-	if(track)
-		hasMoved.push_back(true);
-	else {
-		hasMoved.clear();
-		hasMoved.push_back(true);
-	}
+  else if(track)
+    promote.push_back(false);
+  
+  if(track)
+    hasMoved.push_back(true);
+  else {
+    hasMoved.clear();
+    hasMoved.push_back(true);
+  }
 
 }
 
 void Piece::revert(Piece* spaces[8][8]) {
-
-	if(type==king) {
+  //resets the board one move back
+  if(type==king) {
     if(moves.back().x-position.x == 2)
-	    spaces[position.x+1][position.y]->revert(spaces);
+      spaces[position.x+1][position.y]->revert(spaces);
     if(moves.back().x-position.x == -2)
-	    spaces[position.x-1][position.y]->revert(spaces);
-	}
-          
-	spaces[position.x][position.y] = NULL;
-	position = moves.back();
-	if(promote.back())
-		type = pawn;
+      spaces[position.x-1][position.y]->revert(spaces);
+  }
+  
+  spaces[position.x][position.y] = NULL;
+  position = moves.back();
+  if(promote.back())
+    type = pawn;
   promote.pop_back();
-	moves.pop_back();
+  moves.pop_back();
   hasMoved.pop_back();
-	spaces[position.x][position.y] = this;
+  spaces[position.x][position.y] = this;
 }
 
 void Piece::scan(int x,int y,int range,deque<coord>& moves,Piece* spaces[8][8])
 {
+  //checks area x,y with range
 
   for( int i = 1; i <= range; i++ ) {
     coord space;
@@ -126,9 +130,9 @@ void Piece::scan(int x,int y,int range,deque<coord>& moves,Piece* spaces[8][8])
     if(space.x < 0 || space.x > 7 || space.y < 0 || space.y > 7 )
       return;
 
-    if(spaces[space.x][space.y] == NULL )
+    if(spaces[space.x][space.y] == NULL )  //if empty
       moves.push_back(space);
-    else if (spaces[space.x][space.y]->getColor() == color)
+    else if (spaces[space.x][space.y]->getColor() == color)  //if color
       return;
     else {
       moves.push_back(space);
