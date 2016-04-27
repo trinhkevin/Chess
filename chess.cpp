@@ -172,28 +172,29 @@ void display( Board& board )
 
 int main( int argc, char* args[] )
 {
-  AI* cpu = NULL;
-  int diff;
+  AI* cpuOne = NULL;
+  int diffOne, diffTwo;
+  AI* cpuTwo = NULL;
   Board chessBoard;
   char c;
-  printf("Play against human or CPU (h/c)? ");
+  printf("Play against human, CPU, or watch 2 CPUs (1/2/3)? ");
   std::cin >> c;
 
-  while( c != 'h' && c != 'c' )
+  while( c != '1' && c != '2' && c != '3' )
   {
-    printf("Enter 'h' to play against human or 'c' to play against CPU: ");
+    printf("Enter '1' to play human, '2' to play CPU, '3' for two CPUs: ");
     std::cin >> c;
   }
 
-  if( c == 'c' )
+  if( c == '2' )
   {
     printf("Easy, Mid, or Hard CPU (0/1/2)? ");
-    std::cin >> diff;
+    std::cin >> diffTwo;
 
-    while( diff != 0 && diff != 1 && diff != 2 )
+    while( diffTwo != 0 && diffTwo != 1 && diffTwo != 2 )
     {
       printf("Enter 0 for easy, 1 for Mid, 2 for Hard CPU: ");
-      std::cin >> diff;
+      std::cin >> diffTwo;
     }
 
     printf("Do you want white or black (w/b)? ");
@@ -204,8 +205,36 @@ int main( int argc, char* args[] )
       printf("Enter 'w' to play as white or 'b' to play as black: ");
       std::cin >> c;
     }
-    
-    cpu = new AI(c, &chessBoard);
+   
+		if(c=='w') 
+      cpuTwo = new AI('b', &chessBoard);
+		else
+      cpuTwo = new AI('w', &chessBoard);
+
+  }
+	else if(c == '3') {
+
+    printf("Easy, Mid, or Hard white CPU (0/1/2)? ");
+    std::cin >> diffOne;
+
+    while( diffOne != 0 && diffOne != 1 && diffOne != 2 )
+    {
+      printf("Enter 0 for easy, 1 for Mid, 2 for Hard white CPU: ");
+      std::cin >> diffOne;
+    }
+
+    cpuOne = new AI('w', &chessBoard);
+
+    printf("Easy, Mid, or Hard black CPU (0/1/2)? ");
+    std::cin >> diffTwo;
+
+    while( diffTwo != 0 && diffTwo != 1 && diffTwo != 2 )
+    {
+      printf("Enter 0 for easy, 1 for Mid, 2 for Hard black CPU: ");
+      std::cin >> diffTwo;
+    }
+
+    cpuTwo = new AI('b', &chessBoard);
   }
 
   //Start up SDL and create window
@@ -228,8 +257,8 @@ int main( int argc, char* args[] )
       //Event handler
       SDL_Event e;
       
-      if(cpu)   //check if cpu can move
-        cpu->tryMove(diff,false);
+      if(cpuTwo)   //check if cpu can move
+        cpuTwo->tryMove(diffTwo,false);
 
       display( chessBoard );
 
@@ -246,15 +275,17 @@ int main( int argc, char* args[] )
             quit = true;
           // Mouse Click  
           if(!gameOver && e.type == SDL_MOUSEBUTTONDOWN) {
-       
-            //handle user input
-            chessBoard.handleEvent( &e );
+
+						if(cpuOne)
+							cpuOne->tryMove(diffOne,false);
+						else
+            	chessBoard.handleEvent( &e );  //handle user input
 
       	    if( chessBoard.noMoves(chessBoard.getTurn()) )
 	            gameOver = true;
-            else if(cpu) {   //check if cpu can move
+            else if(cpuTwo) {   //check if cpu can move
               display( chessBoard );
-              cpu->tryMove(diff,false);
+              cpuTwo->tryMove(diffTwo,false);
 	          if( chessBoard.noMoves(chessBoard.getTurn()) )
 	            gameOver = true;
             }

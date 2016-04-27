@@ -17,9 +17,9 @@ class AI {
     Board* board;        //bound chessboard
 };
 
-AI::AI(char opponentColor, Board* chessBoard) {
+AI::AI(char col, Board* chessBoard) {
 
-  if( opponentColor == 'b' )
+  if( col == 'w' )
     color = WHITE;
 
   board = chessBoard;
