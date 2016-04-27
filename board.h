@@ -71,7 +71,7 @@ Board::Board() {
   pos.x++;
   addPiece(new Bishop(pos,WHITE));
   pos.x++;
-  addPiece(new Queen(pos,WHITE));
+  //addPiece(new Queen(pos,WHITE));
   pos.x++;
   addPiece(new King(pos,WHITE));
   pos.x++;
@@ -99,12 +99,21 @@ Board::Board() {
   addPiece(new Rook(pos,BLACK));
 
   for(int i = 0; i < 8; i++)
+	if( i != 2 && i != 4)
   {
     pos.x = i; pos.y = 1;
     addPiece(new Pawn(pos,WHITE ));
     pos.y = 6;
     addPiece(new Pawn(pos,BLACK ));
   }
+    pos.x = 2; pos.y = 4;
+    addPiece(new Pawn(pos,BLACK ));
+    pos.x = 4; pos.y = 4;
+    addPiece(new Pawn(pos,BLACK ));
+    pos.x = 4; pos.y = 3;
+    addPiece(new Pawn(pos,WHITE ));
+    pos.x = 5; pos.y = 2;
+    addPiece(new Queen(pos,WHITE ));
 
 }
 
@@ -147,6 +156,7 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
 			(moves[i].x-pos.x == 2|| moves[i].x-pos.x == -2)) {
       moves.erase(moves.begin()+i);
       i--;
+			continue;
     }
     Piece* lastEnPass = enPass;
 
@@ -167,6 +177,9 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
       addPiece(hold);
     hold = NULL;
   }
+/*	for(int w = 0; w < moves.size(); w++)
+    if(piece->getType()==0 && moves[w].x == 7 && moves[w].y == 3)
+      printf("Hit from board\n");*/
 
   return moves;
 }

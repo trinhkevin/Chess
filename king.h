@@ -21,16 +21,14 @@ King::King(coord nPosition, bool nColor) : Piece(king, nPosition, nColor) {
 deque<coord> King::getPossMoves( Piece* spaces[8][8], Piece* enPass) {
 
 	// Initialize Variables
-        deque<coord> moves;
-        coord ncoord;
-        int x = getPosition().x;
-        int y = getPosition().y;
-
+  deque<coord> moves;
+  coord ncoord;
+  int x = getPosition().x;
+  int y = getPosition().y;
 
 	for(int i = 0; i < 9; i++)
-	  scan( i%3 - 1, i/3 - 1, 1, moves, spaces );
-
-  bool check = false;
+    if(i != 4)
+	  	scan( i%3 - 1, i/3 - 1, 1, moves, spaces );
 
   //castling
 	if( !getHasMoved() ) {

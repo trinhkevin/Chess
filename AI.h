@@ -60,7 +60,12 @@ void AI::lookAhead(int turns, Piece* candidateP, coord* candidateM,
 				candidateP = piece;
 
 			//check through moves
-      deque<coord> moves = board->getPieceMoves(piece);
+      deque<coord> moves =  board->getPieceMoves(piece);
+
+	for(int w = 0; w < moves.size(); w++)
+    if(piece->getType()==0 && moves[w].x == 7 && moves[w].y == 3)
+      printf("Hit\n");
+
       for(int j = 0; j < moves.size(); j++) {
 				//track root move
 				if(first)
