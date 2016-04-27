@@ -98,6 +98,7 @@ Board::Board() {
   pos.x++;
   addPiece(new Rook(pos,BLACK));
 
+  // Add Pawns
   for(int i = 0; i < 8; i++)
   {
     pos.x = i; pos.y = 1;
@@ -124,10 +125,11 @@ void Board::addPiece(Piece* newPiece) {
 
 void Board::removePiece(Piece* capturedPiece) {
 
+  // Set Old Position to NULL
   coord pos = capturedPiece->getPosition();
   spaces[pos.x][pos.y] = NULL;
 
-  //remove from deque
+  // Remove from Deque
   for(int i = 0; i < pieces.size(); i++)
     if(pieces[i] == capturedPiece)
       pieces.erase(pieces.begin()+i);
@@ -135,13 +137,14 @@ void Board::removePiece(Piece* capturedPiece) {
 
 deque<coord> Board::getPieceMoves(Piece* piece) {
 
+  // Get Possible Moves
   deque<coord> moves = piece->getPossMoves(spaces, enPass);
   coord pos = piece->getPosition();
 
-  //look through possible moves
+  // Look through Possible Moves
   for( int i = 0; i < moves.size(); i++ ) {
 
-		//cant' castle out of check
+		// Can't Castle Out of Check
     if(checkCheck(turn) && piece->getType()==king &&
 			(moves[i].x-pos.x == 2|| moves[i].x-pos.x == -2)) {
       moves.erase(moves.begin()+i);
@@ -150,7 +153,7 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
     }
     Piece* lastEnPass = enPass;
 
-    //temporary move
+    // Temporary move
     movePiece( piece, moves[i], true );
 
     if(checkCheck(piece->getColor())) {
@@ -158,7 +161,7 @@ deque<coord> Board::getPieceMoves(Piece* piece) {
       i--;
     }
 
-    //reverse temp move
+    // Reverse temp move
     piece->revert(spaces);
 
 		enPass = lastEnPass;
@@ -193,11 +196,13 @@ bool Board::checkCheck(bool side) {
 
 bool Board::noMoves(bool side) {
 
+    // Check if there are no possible moves
     for(int i = 0; i < pieces.size(); i++)
       if(pieces[i]->getColor()==side)
         if( getPieceMoves(pieces[i]).size() > 0 )
-          return false;
+          return false; // If there are moves, return false
 
+  // Else return true
   return true;
 }
 
